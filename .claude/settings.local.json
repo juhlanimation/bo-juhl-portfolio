@@ -24,7 +24,9 @@
       "Bash(gh repo create:*)",
       "Bash(git push:*)",
       "Bash(npm info:*)",
-      "Bash(git push)"
+      "Bash(git push)",
+      "Bash(npm update:*)",
+      "Bash(npm show:*)"
     ],
     "deny": [],
     "ask": []
