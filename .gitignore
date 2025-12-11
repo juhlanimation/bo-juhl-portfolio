@@ -36,6 +36,13 @@ yarn-error.log*
 # vercel
 .vercel
 
+# source material (original assets)
+/material
+
+# large files (exceed GitHub's 100MB limit)
+public/portfolio_layout.pdf
+public/videos/other-projects/marvel-full-length.webm
+
 # typescript
 *.tsbuildinfo
 next-env.d.ts

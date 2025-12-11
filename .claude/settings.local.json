@@ -1,0 +1,29 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(tree:*)",
+      "Bash(npm run build:*)",
+      "Bash(npm run dev:*)",
+      "Bash(npm install:*)",
+      "Bash(mkdir:*)",
+      "Bash(bash:*)",
+      "Bash(ffmpeg:*)",
+      "Bash(ls:*)",
+      "Bash(find:*)",
+      "Bash(dir /s \"d:\\Programming\\Portfolios\\bo-juhl-portfolio\")",
+      "Bash(powershell \"Get-ChildItem -Path ''D:\\Programming\\Portfolios\\bo-juhl-portfolio'' -Include ''*.ts'',''*.tsx'' -Recurse -Exclude ''node_modules'',''.next'' | Measure-Object -Line | Select-Object -ExpandProperty Lines\")",
+      "Bash(cat:*)",
+      "Bash(npm ls:*)",
+      "Bash(npm install)",
+      "Bash(powershell -Command:*)",
+      "Bash(dir:*)",
+      "Bash(findstr:*)",
+      "Bash(git add:*)",
+      "Bash(git reset:*)",
+      "Bash(git commit:*)",
+      "Bash(gh repo create:*)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}

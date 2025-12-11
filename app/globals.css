@@ -8,8 +8,28 @@
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+
+  /* Font families */
+  --font-family-soleil: var(--font-soleil);
+  --font-family-neue-haas-grotesk: var(--font-neue-haas-grotesk);
+}
+
+/* Tailwind font utilities */
+.font-soleil {
+  font-family: var(--font-soleil), system-ui, -apple-system, sans-serif;
+}
+
+.font-neue-haas-grotesk {
+  font-family: var(--font-neue-haas-grotesk), system-ui, -apple-system, sans-serif;
+}
+
+/* Semantic font utilities */
+.font-title {
+  font-family: var(--font-neue-haas-grotesk), system-ui, -apple-system, sans-serif;
+}
+
+.font-paragraph {
+  font-family: var(--font-soleil), system-ui, -apple-system, sans-serif;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -19,8 +39,133 @@
   }
 }
 
+html {
+  /* Reserve space for scrollbar to prevent layout shifts */
+  scrollbar-gutter: stable;
+}
+
 body {
   background: var(--background);
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
+  overflow-x: hidden;
+}
+
+/* Apply transforms to main content wrapper instead of body to preserve fixed positioning */
+#smooth-scroll-content {
+  /* Transforms removed to allow mix-blend-mode to work on navbar */
+}
+
+/* Marquee Animation */
+@keyframes marquee {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+.animate-marquee {
+  animation: marquee linear infinite;
+}
+
+/* Fade In Animation */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* Slide In Down Animation */
+@keyframes slideInDown {
+  from {
+    transform: translateY(-20px);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
+/* Lenis smooth scroll styles */
+html.lenis,
+html.lenis body {
+  height: auto;
+}
+
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+  will-change: scroll-position;
+}
+
+.lenis.lenis-smooth body {
+  will-change: transform;
+}
+
+.lenis.lenis-smooth [data-lenis-prevent] {
+  overscroll-behavior: contain;
+}
+
+.lenis.lenis-stopped {
+  overflow: hidden;
+}
+
+.lenis.lenis-smooth iframe {
+  pointer-events: none;
+}
+
+/* Box sizing for all elements */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+/* Content max-width container */
+:root {
+  --content-max-width: 2400px;
+}
+
+.content-container {
+  max-width: var(--content-max-width);
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* Custom scrollbar styling */
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #ffffff;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #171717;
+  border-radius: 0;
+}
+
+@media (prefers-color-scheme: dark) {
+  ::-webkit-scrollbar-track {
+    background: #0a0a0a;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: #ededed;
+  }
+}
+
+/* Firefox scrollbar */
+html {
+  scrollbar-width: thin;
+  scrollbar-color: #171717 #ffffff;
+}
+
+@media (prefers-color-scheme: dark) {
+  html {
+    scrollbar-color: #ededed #0a0a0a;
+  }
 }
