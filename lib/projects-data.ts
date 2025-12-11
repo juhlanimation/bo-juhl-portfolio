@@ -198,8 +198,8 @@ export const projects: Project[] = [
   }
 ];
 
-export const bioText = `I come from a creative background in animation, directing, and editing, but most of my career has been spent producing and leading animated projects. I was one of the original founders of Sun Creature and spent more than a decade helping shape its growth - guiding dozens of productions and working with hundreds of artists as the studio evolved from a small team to a large international company. I stepped away from the studio in early 2024 to pursue new paths.
+export const bioText = `Over the past decade, I've led animated films and campaigns for Riot Games, Netflix, Supercell, Amazon, and LEGO - first at Sun Creature, now through my own studio, Crossroad.
 
-Over the years, I've led films and campaigns for clients like Riot Games, Netflix, Supercell, Amazon, and LEGO, and I've learned to balance creative ambition with practical execution. Building the right team for each project is something I care deeply about, drawing on a wide network of directors, creatives, and top-tier artists.
+I was one of the original founders of Sun Creature and spent more than a decade helping shape its growth - guiding dozens of productions and working with hundreds of artists as the studio evolved from a small team to a large international company. I stepped away from the studio in early 2024 to pursue new paths.
 
-Today, I run Crossroad Studio - a remote-first creative setup built to support studios, agencies, and clients with flexible, high-quality production rooted in collaboration, craft, and a deep love for storytelling. I continue to take on freelance and consultancy missions, both through Crossroad and independently - always excited to dive in, help where I can, and contribute to making strong work with good people.`;
+Today, Crossroad is a remote-first setup rooted in collaboration and craft. I also take on freelance and consultancy work - always excited to dive in and make strong work with good people.`;

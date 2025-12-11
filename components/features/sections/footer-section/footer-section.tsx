@@ -32,17 +32,12 @@ export function FooterSection({ settings, isSelected }: Props) {
       }}
       className={`relative ${isSelected ? 'ring-2 ring-primary' : ''}`}
     >
-      {/* Copyright - absolute bottom left, positioned relative to footer */}
-      <div className="font-paragraph absolute bottom-2 left-10 text-xs opacity-50">
-        {copyrightText}
-      </div>
-
       <div className="content-container relative">
         {/* Main footer content */}
-        <div className="px-16 md:px-32 lg:px-48 pb-6">
-        <div className="w-full md:w-1/2 flex gap-8 md:gap-16">
-          {/* Column 1 - Navigation (further away) */}
-          <div className="font-title flex flex-col gap-2 text-sm md:text-base font-light mr-16 md:mr-24">
+        <div className="px-8 md:px-32 lg:px-48 pb-6">
+        <div className="w-full md:w-auto flex flex-col md:flex-row gap-8 md:gap-16">
+          {/* Column 1 - Navigation */}
+          <div className="font-title flex flex-col gap-2 text-sm md:text-base font-light md:mr-24">
             <a href="#hero" className="hover:opacity-70 transition-opacity cursor-pointer">
               HOME
             </a>
@@ -83,6 +78,11 @@ export function FooterSection({ settings, isSelected }: Props) {
           </div>
         </div>
         </div>
+      </div>
+
+      {/* Copyright - absolute bottom left on desktop, relative on mobile */}
+      <div className="font-paragraph text-xs opacity-50 px-8 mt-8 md:mt-0 md:px-0 md:absolute md:bottom-2 md:left-10">
+        {copyrightText}
       </div>
     </footer>
   )

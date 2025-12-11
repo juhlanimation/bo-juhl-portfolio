@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useRef, useEffect, useCallback } from 'react'
+import { useState, useRef, useCallback, useEffect } from 'react'
 import { gsap } from 'gsap'
 import type { MoreProjectsSectionSettings, MoreProjectItem } from './index'
 import { VideoPlayer } from '../../blocks/video-player'
@@ -193,14 +193,6 @@ export function MoreProjectsSection({ settings, isSelected }: Props) {
     // Use placeholder if JSON is invalid
   }
 
-  // Calculate scrollbar width to balance left/right margins
-  // scrollbar-gutter: stable reserves space on the right, so we add the same to the left
-  // Use useEffect to avoid hydration mismatch (server always renders 0, client updates after mount)
-  const [scrollbarWidth, setScrollbarWidth] = useState(0)
-  useEffect(() => {
-    setScrollbarWidth(window.innerWidth - document.documentElement.clientWidth)
-  }, [])
-
   // Handle mouse leave - only collapse if no player is open
   const handleMouseLeave = () => {
     if (!isAnyPlayerOpen) {
@@ -216,17 +208,17 @@ export function MoreProjectsSection({ settings, isSelected }: Props) {
         paddingTop: paddingMap[settings.paddingY] || '8rem',
         paddingBottom: paddingMap[settings.paddingY] || '8rem',
       }}
-      className={`${isSelected ? 'ring-2 ring-primary' : ''}`}
+      className={`hidden md:block ${isSelected ? 'ring-2 ring-primary' : ''}`}
     >
-      <div className="content-container" style={{ paddingLeft: `${scrollbarWidth}px`, paddingRight: 0 }}>
+      <div className="content-container px-10">
         <div className="w-full">
         {/* Section title */}
-        <div className="flex justify-start px-9 mb-8">
+        <div className="flex justify-start mb-8">
           <div className="flex flex-col">
-            <h2 className="font-title text-xs md:text-sm font-bold uppercase text-right">
+            <h2 className="font-title text-xs font-bold uppercase text-right">
               {settings.title || 'OTHER SELECTED PROJECTS'}
             </h2>
-            <span className="font-paragraph text-xs md:text-sm text-right">
+            <span className="font-paragraph text-xs text-right">
               {settings.dateRange || '2018-2024'}
             </span>
           </div>
@@ -234,7 +226,7 @@ export function MoreProjectsSection({ settings, isSelected }: Props) {
 
         {/* Horizontal thumbnails container - only videos */}
         <div
-          className="flex gap-1 mx-9 mt-9 overflow-visible"
+          className="flex gap-1 mt-9 overflow-visible"
           style={{
             height: '32rem',
           }}
@@ -255,7 +247,7 @@ export function MoreProjectsSection({ settings, isSelected }: Props) {
         </div>
 
         {/* Labels row - matches video flex values to stay aligned */}
-        <div className="flex gap-1 mx-9 mt-1 h-24" style={{ color: settings.textColor }}>
+        <div className="flex gap-1 mt-1 h-24" style={{ color: settings.textColor }}>
           {projects.map((project) => (
             <div
               key={project.id}

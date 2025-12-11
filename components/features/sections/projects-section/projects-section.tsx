@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef } from "react";
 import type { ProjectsSectionSettings, ProjectItem } from "./index";
 import { VideoPlayer } from "../../blocks/video-player";
 
@@ -138,8 +138,8 @@ function ProjectCard({
       {/* Client and Studio info */}
       {(project.client || project.studio) && (
         <div
-          className={`font-paragraph flex flex-wrap gap-x-8 gap-y-1 mt-3 text-xs opacity-60 overflow-hidden ${
-            alignment === "right" ? "justify-end text-right" : "justify-start text-left"
+          className={`font-paragraph flex flex-wrap gap-x-8 gap-y-1 mt-3 text-xs opacity-60 overflow-hidden justify-start text-left ${
+            alignment === "right" ? "md:justify-end md:text-right" : ""
           }`}
         >
           {project.client && (
@@ -155,19 +155,19 @@ function ProjectCard({
 
   const textContent = (
     <div
-      className={`flex flex-col pt-2 w-full max-w-[350px] ${
-        alignment === "right" ? "items-end" : "items-start"
+      className={`flex flex-col pt-2 w-full max-w-[350px] items-start ${
+        alignment === "right" ? "md:items-end" : ""
       }`}
     >
       <h3
-        className={`font-title text-xs md:text-sm font-bold uppercase mb-3 w-full ${
-          alignment === "right" ? "text-right" : "text-left"
+        className={`font-title text-xs font-bold uppercase mb-3 w-full text-left ${
+          alignment === "right" ? "md:text-right" : ""
         }`}
       >
         {project.title}
       </h3>
       <p
-        className="font-paragraph text-xs md:text-sm leading-relaxed opacity-80 whitespace-pre-line w-full text-justify"
+        className={`font-paragraph text-xs leading-relaxed opacity-80 whitespace-pre-line w-full text-justify`}
         style={{
           textAlignLast: alignment === "right" ? "right" : "left"
         }}
@@ -215,14 +215,6 @@ export function ProjectsSection({ settings, isSelected }: Props) {
     // Use placeholder if JSON is invalid
   }
 
-  // Calculate scrollbar width to balance left/right margins
-  // scrollbar-gutter: stable reserves space on the right, so we add the same to the left
-  // Use useEffect to avoid hydration mismatch (server always renders 0, client updates after mount)
-  const [scrollbarWidth, setScrollbarWidth] = useState(0);
-  useEffect(() => {
-    setScrollbarWidth(window.innerWidth - document.documentElement.clientWidth);
-  }, []);
-
   return (
     <section
       id="projects"
@@ -234,13 +226,7 @@ export function ProjectsSection({ settings, isSelected }: Props) {
       }}
       className={`${isSelected ? "ring-2 ring-primary" : ""}`}
     >
-      <div
-        className="content-container"
-        style={{
-          paddingLeft: `${scrollbarWidth}px`,
-          paddingRight: 0,
-        }}
-      >
+      <div className="content-container px-2">
         <div className="w-full flex flex-col my-2" style={{ gap: settings.gap }}>
         {projects.map((project, index) => (
           <ProjectCard

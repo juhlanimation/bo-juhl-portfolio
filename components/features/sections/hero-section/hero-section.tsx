@@ -149,8 +149,17 @@ export function HeroSection({ settings, isSelected }: Props) {
           {/* Spacer to push content to bottom area */}
           <div className="flex-grow" style={{ minHeight: "55vh" }} />
 
-          {/* Titles */}
+          {/* Name and Titles */}
           <div className="flex flex-col gap-4 md:gap-6 mt-6 pb-24">
+            <p
+              className="font-paragraph text-sm md:text-base font-medium tracking-wide mb-2"
+              style={{
+                color: "#ffffff",
+                mixBlendMode: "difference",
+              }}
+            >
+              I'm Bo Juhl
+            </p>
             {titles.map((title, index) => (
               <h1
                 key={index}

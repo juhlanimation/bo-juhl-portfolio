@@ -7,6 +7,8 @@ import type { AboutSectionSettings } from "./index";
 
 gsap.registerPlugin(ScrollTrigger);
 
+// Note: heroName setting is no longer used - "I'm Bo Juhl" is now displayed statically in hero section
+
 interface Props {
   settings: AboutSectionSettings;
   isSelected?: boolean;
@@ -24,7 +26,6 @@ export function AboutSection({ settings, isSelected }: Props) {
   const logos = logosString.split('\n').filter(url => url.trim());
   const imageRef = useRef<HTMLImageElement>(null);
   const sectionRef = useRef<HTMLElement>(null);
-  const nameRef = useRef<HTMLDivElement>(null);
   const paragraphRef = useRef<HTMLParagraphElement>(null);
   const marqueeRef = useRef<HTMLDivElement>(null);
   const [isHighResLoaded, setIsHighResLoaded] = useState(false);
@@ -40,38 +41,6 @@ export function AboutSection({ settings, isSelected }: Props) {
   useEffect(() => {
     setIsClient(true);
   }, []);
-
-  // Scroll-linked animation for "I'm Bo Juhl" text
-  useEffect(() => {
-    if (!nameRef.current || !sectionRef.current || !isClient) return;
-
-    const section = sectionRef.current;
-    const name = nameRef.current;
-    const translateDistance = window.innerHeight * 0.50;
-
-    // Use fromTo with immediateRender to guarantee initial state
-    const tween = gsap.fromTo(
-      name,
-      { y: -translateDistance, force3D: true },
-      {
-        y: 0,
-        ease: "none",
-        force3D: true,
-        immediateRender: true,
-        scrollTrigger: {
-          trigger: section,
-          start: "top bottom",
-          end: `top+=${translateDistance}px bottom`,
-          scrub: 0,
-          invalidateOnRefresh: true,
-        },
-      }
-    );
-
-    return () => {
-      tween.kill();
-    };
-  }, [isClient]);
 
   // Fade-in effect for content elements (paragraph, image, marquee)
   useEffect(() => {
@@ -165,28 +134,12 @@ export function AboutSection({ settings, isSelected }: Props) {
         {/* Left - Text (positioned from top, left aligned) */}
         <div className="w-full md:w-1/2 flex items-start px-8 md:px-16 lg:px-24 pt-32 md:pt-40">
           <div className="max-w-[500px]">
-            {/* Name text - animated to appear in hero section */}
-            <div
-              ref={nameRef}
-              className="mb-8 relative z-100"
-              style={{
-                mixBlendMode: "difference",
-                // GSAP will set the transform - use visibility to prevent flash before JS runs
-                visibility: isClient ? "visible" : "hidden",
-                willChange: "transform",
-              }}
-            >
-              <p
-                className="font-paragraph text-base md:text-lg font-medium tracking-wide"
-                style={{
-                  color: "#ffffff",
-                }}
-              >
-                {settings.heroName || "I'm Bo Juhl"}
-              </p>
-            </div>
+            {/* About Me title */}
+            <h2 className="font-title text-base md:text-lg font-bold mb-6" style={{ color: settings.textColor }}>
+              MY PATH
+            </h2>
 
-            <p ref={paragraphRef} className="font-paragraph text-base md:text-lg leading-relaxed text-justify m-0" style={{ whiteSpace: 'pre-line', opacity: 0 }}>
+            <p ref={paragraphRef} className="font-paragraph text-sm md:text-sm leading-relaxed text-justify m-0" style={{ whiteSpace: 'pre-line', opacity: 0 }}>
               {settings.paragraph || "About text goes here..."}
             </p>
           </div>
