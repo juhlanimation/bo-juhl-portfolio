@@ -2,6 +2,7 @@ import { cacheLife } from "next/cache"
 import type { ProjectsSectionSettings } from "./index"
 import type { FeaturedProject } from "@/lib/types"
 import { parseJsonWithFallback, scaleUnitValue, getPadding, sectionPaddingMap } from "@/lib/utils"
+import { FEATURED_PLACEHOLDER_PROJECTS } from "@/lib/constants/placeholder-projects"
 import { ProjectCard } from "./project-card"
 
 interface Props {
@@ -9,59 +10,13 @@ interface Props {
   isSelected?: boolean
 }
 
-// Placeholder projects for preview
-const placeholderProjects: FeaturedProject[] = [
-  {
-    id: "1",
-    title: "Project One",
-    description: "Description for project one goes here. This is a brief overview of the work.",
-    thumbnailUrl: "",
-    videoUrl: "",
-  },
-  {
-    id: "2",
-    title: "Project Two",
-    description: "Description for project two goes here. This is a brief overview of the work.",
-    thumbnailUrl: "",
-    videoUrl: "",
-  },
-  {
-    id: "3",
-    title: "Project Three",
-    description: "Description for project three goes here. This is a brief overview of the work.",
-    thumbnailUrl: "",
-    videoUrl: "",
-  },
-  {
-    id: "4",
-    title: "Project Four",
-    description: "Description for project four goes here. This is a brief overview of the work.",
-    thumbnailUrl: "",
-    videoUrl: "",
-  },
-  {
-    id: "5",
-    title: "Project Five",
-    description: "Description for project five goes here. This is a brief overview of the work.",
-    thumbnailUrl: "",
-    videoUrl: "",
-  },
-  {
-    id: "6",
-    title: "Project Six",
-    description: "Description for project six goes here. This is a brief overview of the work.",
-    thumbnailUrl: "",
-    videoUrl: "",
-  },
-]
-
 export async function ProjectsSection({ settings, isSelected }: Props) {
   "use cache"
   cacheLife("days")
 
   const projects = parseJsonWithFallback<FeaturedProject[]>(
     settings.projectsJson,
-    placeholderProjects
+    FEATURED_PLACEHOLDER_PROJECTS
   )
 
   const gapValue = settings.gap || "3.2rem"

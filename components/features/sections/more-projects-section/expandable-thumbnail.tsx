@@ -1,60 +1,43 @@
 "use client"
 
-import { useState, useRef, useCallback, useEffect } from "react"
-import { createPortal } from "react-dom"
-import Image from "next/image"
+import { useState, useRef, useCallback } from "react"
 import { gsap } from "gsap"
 import type { CompactProject } from "@/lib/types"
-import { useTouchDevice, useVideoPlayback } from "@/lib/hooks"
+import { useCursorLabel } from "@/lib/hooks"
+import { CursorLabel } from "@/components/ui/cursor-label"
+import { HoverVideoContainer } from "@/components/ui/hover-video-container"
 import { VideoPlayer } from "../../blocks/video-player"
+import { DIMENSIONS, ANIMATION_DURATIONS } from "@/lib/constants/animations"
 
 interface ExpandableThumbnailProps {
   project: CompactProject
   isExpanded: boolean
   onExpand: () => void
   onPlayerOpenChange: (isOpen: boolean) => void
-  expandScale: number
   transitionDuration: number
 }
 
 /**
  * ExpandableThumbnail - Single project thumbnail that expands on hover
  * SRP: Handles one thumbnail's expand/collapse and video player state
- * Extracted from MoreProjectsSection for better separation of concerns
+ * Uses HoverVideoContainer for DRY video/image display
+ * Uses useCursorLabel for DRY cursor tracking
  */
 export function ExpandableThumbnail({
   project,
   isExpanded,
   onExpand,
   onPlayerOpenChange,
-  expandScale: _expandScale,
   transitionDuration,
 }: ExpandableThumbnailProps) {
-  // Note: expandScale is received but not currently used (reserved for future use)
-  void _expandScale
-  const isTouchDevice = useTouchDevice()
   const containerRef = useRef<HTMLDivElement>(null)
-  const videoRef = useRef<HTMLVideoElement>(null)
   const blackOverlayRef = useRef<HTMLDivElement>(null)
   const [isPlayerOpen, setIsPlayerOpen] = useState(false)
   const [sourceRect, setSourceRect] = useState<DOMRect | null>(null)
-  const [mousePos, setMousePos] = useState({ x: 0, y: 0 })
-  const [mounted, setMounted] = useState(false)
+  const { mousePos, cursorProps } = useCursorLabel()
 
   // Keep video playing when expanded OR when player is open
   const showVideo = isExpanded || isPlayerOpen
-  useVideoPlayback(videoRef, showVideo, project.videoUrl)
-
-  // For portal (SSR safety - intentional pattern)
-  useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect -- intentional SSR hydration
-    setMounted(true)
-  }, [])
-
-  // Handle mouse move for cursor label
-  const handleMouseMove = (e: React.MouseEvent) => {
-    setMousePos({ x: e.clientX, y: e.clientY })
-  }
 
   const handleClick = useCallback(() => {
     if (project.videoUrl && containerRef.current && blackOverlayRef.current) {
@@ -72,7 +55,7 @@ export function ExpandableThumbnail({
 
       gsap.to(blackOverlayRef.current, {
         opacity: 1,
-        duration: 0.3,
+        duration: ANIMATION_DURATIONS.FADE,
         ease: "power2.inOut",
         onComplete: () => {
           setIsPlayerOpen(true)
@@ -89,7 +72,7 @@ export function ExpandableThumbnail({
     if (blackOverlayRef.current) {
       gsap.to(blackOverlayRef.current, {
         opacity: 0,
-        duration: 0.3,
+        duration: ANIMATION_DURATIONS.FADE,
         ease: "power2.inOut",
       })
     }
@@ -101,42 +84,31 @@ export function ExpandableThumbnail({
         ref={containerRef}
         className="relative overflow-hidden cursor-pointer"
         style={{
-          flex: isExpanded || isPlayerOpen ? "0 0 32rem" : 1,
+          flex: isExpanded || isPlayerOpen ? `0 0 ${DIMENSIONS.EXPANDED_THUMBNAIL_WIDTH}` : 1,
           transition: `flex ${transitionDuration}ms ease-out, width ${transitionDuration}ms ease-out`,
           minWidth: 0,
           height: "100%",
-          width: isExpanded || isPlayerOpen ? "32rem" : undefined,
+          width: isExpanded || isPlayerOpen ? DIMENSIONS.EXPANDED_THUMBNAIL_WIDTH : undefined,
         }}
-        onMouseEnter={onExpand}
-        onMouseMove={handleMouseMove}
+        onMouseEnter={() => {
+          onExpand()
+          cursorProps.onMouseEnter()
+        }}
+        onMouseLeave={cursorProps.onMouseLeave}
+        onMouseMove={cursorProps.onMouseMove}
         onClick={handleClick}
       >
-        {project.thumbnailUrl ? (
-          <Image
-            src={project.thumbnailUrl}
-            alt={project.title}
-            fill
-            className={`object-cover transition-opacity duration-300 ${
-              showVideo && project.videoUrl ? "opacity-0" : "opacity-100"
-            }`}
-          />
-        ) : (
-          <div className="absolute inset-0 bg-zinc-200 flex items-center justify-center text-zinc-400 text-sm">
-            {project.title}
-          </div>
-        )}
-        {project.videoUrl && (
-          <video
-            ref={videoRef}
-            src={project.videoUrl}
-            muted
-            loop
-            playsInline
-            className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-300 ${
-              showVideo ? "opacity-100" : "opacity-0"
-            }`}
-          />
-        )}
+        <HoverVideoContainer
+          thumbnailUrl={project.thumbnailUrl}
+          videoUrl={project.videoUrl}
+          alt={project.title}
+          isActive={showVideo}
+          fallback={
+            <div className="absolute inset-0 bg-zinc-200 flex items-center justify-center text-zinc-400 text-sm">
+              {project.title}
+            </div>
+          }
+        />
 
         <div
           ref={blackOverlayRef}
@@ -145,25 +117,11 @@ export function ExpandableThumbnail({
         />
       </div>
 
-      {/* Cursor label for "watch" - hidden on touch devices */}
-      {mounted &&
-        !isTouchDevice &&
-        createPortal(
-          <div
-            className="fixed pointer-events-none z-50 text-[10px] font-medium whitespace-nowrap uppercase tracking-wide"
-            style={{
-              left: 0,
-              top: 0,
-              transform: `translate(${mousePos.x + 24}px, ${mousePos.y + 8}px)`,
-              transition: "opacity 0.15s ease-out",
-              color: "var(--interaction)",
-              opacity: isExpanded && !isPlayerOpen ? 1 : 0,
-            }}
-          >
-            watch
-          </div>,
-          document.body
-        )}
+      <CursorLabel
+        label="watch"
+        isVisible={isExpanded && !isPlayerOpen}
+        mousePos={mousePos}
+      />
 
       <VideoPlayer
         videoUrl={project.fullLengthVideoUrl || project.videoUrl}

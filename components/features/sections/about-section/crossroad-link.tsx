@@ -1,29 +1,19 @@
 "use client"
 
-import { useState, useEffect } from "react"
-import { createPortal } from "react-dom"
-import { useTouchDevice } from "@/lib/hooks"
+import { useCursorLabel } from "@/lib/hooks"
+import { CursorLabel } from "@/components/ui/cursor-label"
 
 interface CrossroadLinkProps {
   children: React.ReactNode
   href: string
 }
 
+/**
+ * CrossroadLink - External link with cursor label
+ * Uses useCursorLabel for DRY cursor tracking
+ */
 export function CrossroadLink({ children, href }: CrossroadLinkProps) {
-  const isTouchDevice = useTouchDevice()
-  const [isHovered, setIsHovered] = useState(false)
-  const [mousePos, setMousePos] = useState({ x: 0, y: 0 })
-  const [mounted, setMounted] = useState(false)
-
-  // Intentional SSR safety pattern for portal
-  useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect -- intentional SSR hydration
-    setMounted(true)
-  }, [])
-
-  const handleMouseMove = (e: React.MouseEvent) => {
-    setMousePos({ x: e.clientX, y: e.clientY })
-  }
+  const { mousePos, isHovered, cursorProps } = useCursorLabel()
 
   return (
     <>
@@ -32,31 +22,11 @@ export function CrossroadLink({ children, href }: CrossroadLinkProps) {
         target="_blank"
         rel="noopener noreferrer"
         style={{ color: "var(--interaction)" }}
-        onMouseEnter={() => setIsHovered(true)}
-        onMouseLeave={() => setIsHovered(false)}
-        onMouseMove={handleMouseMove}
+        {...cursorProps}
       >
         {children}
       </a>
-      {/* Cursor label - hidden on touch devices */}
-      {mounted &&
-        !isTouchDevice &&
-        createPortal(
-          <div
-            className="fixed pointer-events-none z-50 text-[10px] font-medium whitespace-nowrap uppercase tracking-wide"
-            style={{
-              left: 0,
-              top: 0,
-              transform: `translate(${mousePos.x + 24}px, ${mousePos.y + 8}px)`,
-              transition: "opacity 0.15s ease-out",
-              color: "var(--interaction)",
-              opacity: isHovered ? 1 : 0,
-            }}
-          >
-            enter
-          </div>,
-          document.body
-        )}
+      <CursorLabel label="enter" isVisible={isHovered} mousePos={mousePos} />
     </>
   )
 }

@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef, useEffect, ReactNode } from "react";
+import { ANIMATION_DURATIONS } from "@/lib/constants/animations";
 
 interface FadeInProps {
   children: ReactNode;
@@ -10,6 +11,13 @@ interface FadeInProps {
 
 export function FadeIn({ children, className = "", delay = 0 }: FadeInProps) {
   const ref = useRef<HTMLDivElement>(null);
+  // Use ref for delay to avoid recreating observer when delay changes
+  const delayRef = useRef(delay);
+
+  // Keep delay ref in sync
+  useEffect(() => {
+    delayRef.current = delay;
+  }, [delay]);
 
   useEffect(() => {
     const el = ref.current;
@@ -24,8 +32,8 @@ export function FadeIn({ children, className = "", delay = 0 }: FadeInProps) {
             setTimeout(() => {
               el.style.willChange = "auto";
               el.style.transform = "none";
-            }, 700); // Match transition duration
-          }, delay);
+            }, ANIMATION_DURATIONS.FADE_IN * 1000); // Convert seconds to ms
+          }, delayRef.current);
           observer.disconnect();
         }
       },
@@ -34,7 +42,7 @@ export function FadeIn({ children, className = "", delay = 0 }: FadeInProps) {
 
     observer.observe(el);
     return () => observer.disconnect();
-  }, [delay]);
+  }, []); // No dependencies - observer created once on mount
 
   return (
     <div
@@ -42,7 +50,7 @@ export function FadeIn({ children, className = "", delay = 0 }: FadeInProps) {
       className={className}
       style={{
         opacity: 0,
-        transition: "opacity 0.7s ease-out",
+        transition: `opacity ${ANIMATION_DURATIONS.FADE_IN}s ease-out`,
         willChange: "opacity",
         transform: "translateZ(0)",
       }}

@@ -72,7 +72,11 @@ export async function AboutSection({ settings, isSelected }: Props) {
         </div>
 
         <div className="hidden md:block w-1/2 overflow-hidden" style={{ height: '100dvh' }}>
-          <ProgressiveImage imageUrl={settings.imageUrl} alt="About" />
+          <ProgressiveImage
+            highResUrl={settings.imageUrl}
+            lowResUrl={settings.imageUrl?.replace("profile-highres", "profile-lowres")}
+            alt="About"
+          />
         </div>
       </ScrollFade>
 

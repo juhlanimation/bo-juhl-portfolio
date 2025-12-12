@@ -1,10 +1,10 @@
 "use client"
 
-import { useState, useRef, useEffect } from "react"
-import { createPortal } from "react-dom"
-import Image from "next/image"
+import { useState } from "react"
 import type { FeaturedProject } from "@/lib/types"
-import { useTouchDevice, useVideoPlayback } from "@/lib/hooks"
+import { useCursorLabel } from "@/lib/hooks"
+import { CursorLabel } from "@/components/ui/cursor-label"
+import { HoverVideoContainer } from "@/components/ui/hover-video-container"
 import { VideoPlayer } from "../../blocks/video-player"
 
 interface ProjectCardProps {
@@ -16,29 +16,12 @@ interface ProjectCardProps {
 /**
  * ProjectCard - Displays a featured project with hover video and click-to-play
  * SRP: Handles presentation of a single project card
- * Uses useVideoPlayback hook for DRY video control logic
+ * Uses HoverVideoContainer for DRY video/image display
+ * Uses useCursorLabel for DRY cursor tracking
  */
 export function ProjectCard({ project, alignment, textColor }: ProjectCardProps) {
-  const isTouchDevice = useTouchDevice()
-  const [isHovered, setIsHovered] = useState(false)
   const [isPlayerOpen, setIsPlayerOpen] = useState(false)
-  const [mousePos, setMousePos] = useState({ x: 0, y: 0 })
-  const [mounted, setMounted] = useState(false)
-  const videoRef = useRef<HTMLVideoElement>(null)
-
-  // For portal (SSR safety - intentional pattern)
-  useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect -- intentional SSR hydration
-    setMounted(true)
-  }, [])
-
-  // Use shared hook for video playback control
-  useVideoPlayback(videoRef, isHovered, project.videoUrl)
-
-  // Handle mouse move for cursor label
-  const handleMouseMove = (e: React.MouseEvent) => {
-    setMousePos({ x: e.clientX, y: e.clientY })
-  }
+  const { mousePos, isHovered, cursorProps } = useCursorLabel()
 
   const handleClick = () => {
     if (project.fullLengthVideoUrl || project.videoUrl) {
@@ -50,37 +33,20 @@ export function ProjectCard({ project, alignment, textColor }: ProjectCardProps)
     <div className="flex flex-col w-full md:w-[55vw] shrink-0 min-w-0">
       <div
         className="relative w-full aspect-video overflow-hidden cursor-pointer"
-        onMouseEnter={() => setIsHovered(true)}
-        onMouseLeave={() => setIsHovered(false)}
-        onMouseMove={handleMouseMove}
+        {...cursorProps}
         onClick={handleClick}
       >
-        {project.thumbnailUrl ? (
-          <Image
-            src={project.thumbnailUrl}
-            alt={project.title}
-            fill
-            className={`object-cover transition-opacity duration-300 ${
-              isHovered && project.videoUrl ? "opacity-0" : "opacity-100"
-            }`}
-          />
-        ) : (
-          <div className="absolute inset-0 bg-zinc-200 flex items-center justify-center text-zinc-400">
-            No image
-          </div>
-        )}
-        {project.videoUrl && (
-          <video
-            ref={videoRef}
-            src={project.videoUrl}
-            muted
-            loop
-            playsInline
-            className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-300 ${
-              isHovered ? "opacity-100" : "opacity-0"
-            }`}
-          />
-        )}
+        <HoverVideoContainer
+          thumbnailUrl={project.thumbnailUrl}
+          videoUrl={project.videoUrl}
+          alt={project.title}
+          isActive={isHovered}
+          fallback={
+            <div className="absolute inset-0 bg-zinc-200 flex items-center justify-center text-zinc-400">
+              No image
+            </div>
+          }
+        />
       </div>
       {(project.client || project.studio) && (
         <div
@@ -136,25 +102,7 @@ export function ProjectCard({ project, alignment, textColor }: ProjectCardProps)
         {textContent}
       </div>
 
-      {/* Cursor label for "watch" - hidden on touch devices */}
-      {mounted &&
-        !isTouchDevice &&
-        createPortal(
-          <div
-            className="fixed pointer-events-none z-50 text-[10px] font-medium whitespace-nowrap uppercase tracking-wide"
-            style={{
-              left: 0,
-              top: 0,
-              transform: `translate(${mousePos.x + 24}px, ${mousePos.y + 8}px)`,
-              transition: "opacity 0.15s ease-out",
-              color: "var(--interaction)",
-              opacity: isHovered ? 1 : 0,
-            }}
-          >
-            watch
-          </div>,
-          document.body
-        )}
+      <CursorLabel label="watch" isVisible={isHovered} mousePos={mousePos} />
 
       <VideoPlayer
         videoUrl={project.fullLengthVideoUrl || project.videoUrl}

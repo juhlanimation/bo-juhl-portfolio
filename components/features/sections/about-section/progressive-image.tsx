@@ -1,28 +1,32 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import Image from "next/image";
 
 interface ProgressiveImageProps {
-  imageUrl?: string;
+  /** High-resolution image URL */
+  highResUrl?: string;
+  /** Low-resolution placeholder image URL (optional - enables progressive loading) */
+  lowResUrl?: string;
   alt: string;
 }
 
-export function ProgressiveImage({ imageUrl, alt }: ProgressiveImageProps) {
+export function ProgressiveImage({ highResUrl, lowResUrl, alt }: ProgressiveImageProps) {
   const [isHighResLoaded, setIsHighResLoaded] = useState(false);
 
-  // Progressive image loading: determine if we need low-res fallback
-  const lowResImage = imageUrl?.replace("profile-highres", "profile-lowres");
-  const highResImage = imageUrl;
-  const shouldUseProgressive = imageUrl?.includes("profile-highres");
+  // Progressive loading is enabled when both URLs are provided
+  const shouldUseProgressive = useMemo(
+    () => Boolean(highResUrl && lowResUrl),
+    [highResUrl, lowResUrl]
+  );
 
   // Preload high-res image in the background
   useEffect(() => {
-    if (!shouldUseProgressive || !highResImage) return;
+    if (!shouldUseProgressive || !highResUrl) return;
 
     let isCancelled = false;
     const img = new window.Image();
-    img.src = highResImage;
+    img.src = highResUrl;
     img.onload = () => {
       if (!isCancelled) {
         setIsHighResLoaded(true);
@@ -32,9 +36,9 @@ export function ProgressiveImage({ imageUrl, alt }: ProgressiveImageProps) {
     return () => {
       isCancelled = true;
     };
-  }, [shouldUseProgressive, highResImage]);
+  }, [shouldUseProgressive, highResUrl]);
 
-  if (!imageUrl) {
+  if (!highResUrl) {
     return (
       <div className="w-full h-full bg-zinc-800 flex items-center justify-center text-zinc-500">
         No image
@@ -45,9 +49,9 @@ export function ProgressiveImage({ imageUrl, alt }: ProgressiveImageProps) {
   return (
     <div className="relative w-full h-[110%]">
       {/* Low-res image (shown first) */}
-      {shouldUseProgressive && lowResImage && (
+      {shouldUseProgressive && lowResUrl && (
         <Image
-          src={lowResImage}
+          src={lowResUrl}
           alt={alt}
           fill
           className="object-cover transition-opacity duration-500"
@@ -56,7 +60,7 @@ export function ProgressiveImage({ imageUrl, alt }: ProgressiveImageProps) {
       )}
       {/* High-res image (fades in when loaded) */}
       <Image
-        src={imageUrl}
+        src={highResUrl}
         alt={alt}
         fill
         className="object-cover transition-opacity duration-500"

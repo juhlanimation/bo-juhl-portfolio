@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
+import { TIMING } from "@/lib/constants/animations"
 
 /**
  * Hook to detect if the user is currently using touch input
@@ -21,7 +22,7 @@ export function useTouchDevice(): boolean {
 
     const handleMouseMove = () => {
       // Ignore mouse events that fire immediately after touch (ghost events)
-      if (Date.now() - lastTouchTime < 500) return
+      if (Date.now() - lastTouchTime < TIMING.TOUCH_GHOST_EVENT_TIMEOUT) return
       setIsTouchMode(false)
     }
 

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useCallback, useState } from "react";
+import { useEffect, useRef, useState, useCallback } from "react";
 import Image from "next/image";
 import { FadeIn } from "@/components/ui/fade-in";
 import type { LogoConfig } from "@/lib/logo-config";
@@ -22,30 +22,44 @@ export function LogoMarquee({ logos, speed = 50, gap = 96 }: LogoMarqueeProps) {
   const positionRef = useRef(0);
   const lastTimeRef = useRef<number | null>(null);
   const singleSetWidthRef = useRef(0);
-  const animateFnRef = useRef<((timestamp: number) => void) | null>(null);
+  // Use ref for speed to avoid recreating animate function on speed changes
+  const speedRef = useRef(speed);
+
+  // Keep speed ref in sync with prop
+  useEffect(() => {
+    speedRef.current = speed;
+  }, [speed]);
 
   const maxHeight = Math.max(...logos.map((l) => l.height), 48);
 
-  // Calculate how many times to repeat logos to fill the screen
+  // Memoized calculation to avoid unnecessary state updates
+  const calculateRepeatCount = useCallback(() => {
+    const viewportWidth = window.innerWidth;
+    const singleSetWidth = logos.length * (LOGO_WIDTH + gap);
+    singleSetWidthRef.current = singleSetWidth;
+
+    // Need enough copies to fill viewport + one extra for seamless loop
+    const copiesNeeded = Math.ceil(viewportWidth / singleSetWidth) + 2;
+    const newCount = Math.max(2, copiesNeeded);
+
+    // Only update state if value actually changed
+    setRepeatCount((prev) => (prev === newCount ? prev : newCount));
+  }, [logos.length, gap]);
+
+  // Calculate repeat count on mount and resize
   useEffect(() => {
-    const calculateRepeatCount = () => {
-      const viewportWidth = window.innerWidth;
-      const singleSetWidth = logos.length * (LOGO_WIDTH + gap);
-      singleSetWidthRef.current = singleSetWidth;
-
-      // Need enough copies to fill viewport + one extra for seamless loop
-      const copiesNeeded = Math.ceil(viewportWidth / singleSetWidth) + 2;
-      setRepeatCount(Math.max(2, copiesNeeded));
-    };
-
+    // Intentional: Need to calculate initial value and respond to resize events
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     calculateRepeatCount();
     window.addEventListener("resize", calculateRepeatCount);
     return () => window.removeEventListener("resize", calculateRepeatCount);
-  }, [logos.length, gap]);
+  }, [calculateRepeatCount]);
 
-  // Animate the marquee using requestAnimationFrame for smooth infinite scroll
-  const animate = useCallback(
-    (timestamp: number) => {
+  // Start animation on mount - stable function that reads speed from ref
+  useEffect(() => {
+    if (logos.length === 0) return;
+
+    const animate = (timestamp: number) => {
       if (!trackRef.current) return;
 
       if (lastTimeRef.current === null) {
@@ -55,8 +69,8 @@ export function LogoMarquee({ logos, speed = 50, gap = 96 }: LogoMarqueeProps) {
       const delta = timestamp - lastTimeRef.current;
       lastTimeRef.current = timestamp;
 
-      // Move position based on speed (pixels per second)
-      positionRef.current -= (speed * delta) / 1000;
+      // Move position based on speed (read from ref for latest value)
+      positionRef.current -= (speedRef.current * delta) / 1000;
 
       // Width of one complete set
       const singleSetWidth = singleSetWidthRef.current;
@@ -68,18 +82,8 @@ export function LogoMarquee({ logos, speed = 50, gap = 96 }: LogoMarqueeProps) {
 
       trackRef.current.style.transform = `translateX(${positionRef.current}px)`;
 
-      // Use ref for recursive call to avoid accessing variable before declaration
-      animationRef.current = requestAnimationFrame(animateFnRef.current!);
-    },
-    [speed]
-  );
-
-  // Start animation on mount
-  useEffect(() => {
-    if (logos.length === 0) return;
-
-    // Store animate function in ref for recursive calls (must be in effect, not during render)
-    animateFnRef.current = animate;
+      animationRef.current = requestAnimationFrame(animate);
+    };
 
     // Small delay to ensure layout is calculated
     const timer = setTimeout(() => {
@@ -93,7 +97,7 @@ export function LogoMarquee({ logos, speed = 50, gap = 96 }: LogoMarqueeProps) {
         cancelAnimationFrame(animationRef.current);
       }
     };
-  }, [animate, logos.length, gap]);
+  }, [logos.length, gap]);
 
   if (logos.length === 0) {
     return (

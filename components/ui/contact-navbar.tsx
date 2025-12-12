@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useCallback, useEffect, useRef } from "react";
+import { gsap } from "gsap";
 import { useSmoothScroll } from "@/components/providers/smooth-scroll-provider";
 
 interface Props {
@@ -8,27 +9,28 @@ interface Props {
   contactPrompt: string;
 }
 
+type CopyState = "idle" | "copied" | "failed";
+
 export function ContactNavbar({ email, contactPrompt }: Props) {
   const [isHovered, setIsHovered] = useState(false);
-  const [isCopied, setIsCopied] = useState(false);
+  const [copyState, setCopyState] = useState<CopyState>("idle");
   const navRef = useRef<HTMLDivElement>(null);
   const smoothScroll = useSmoothScroll();
 
   // Keep navbar visually fixed by counteracting the smooth-content transform
+  // Use GSAP ticker (already running for smooth scroll) instead of separate RAF loop
   useEffect(() => {
     const smoother = smoothScroll?.getSmoother();
     if (!smoother || !navRef.current) return;
 
-    let rafId: number;
     const updatePosition = () => {
       if (navRef.current) {
         navRef.current.style.transform = `translateY(${smoother.scrollTop()}px)`;
       }
-      rafId = requestAnimationFrame(updatePosition);
     };
 
-    rafId = requestAnimationFrame(updatePosition);
-    return () => cancelAnimationFrame(rafId);
+    gsap.ticker.add(updatePosition);
+    return () => gsap.ticker.remove(updatePosition);
   }, [smoothScroll]);
 
   const handleMouseEnter = useCallback(() => {
@@ -44,18 +46,18 @@ export function ContactNavbar({ email, contactPrompt }: Props) {
 
     try {
       await navigator.clipboard.writeText(email);
-      setIsCopied(true);
-
-      setTimeout(() => {
-        setIsCopied(false);
-      }, 2000);
-    } catch (err) {
-      console.error("Failed to copy:", err);
+      setCopyState("copied");
+      setTimeout(() => setCopyState("idle"), 2000);
+    } catch {
+      setCopyState("failed");
+      setTimeout(() => setCopyState("idle"), 2000);
     }
   }, [email, isHovered]);
 
   // When copied, revert to difference blend mode with white text
-  const showPurple = isHovered && !isCopied;
+  const isCopied = copyState === "copied";
+  const copyFailed = copyState === "failed";
+  const showPurple = isHovered && copyState === "idle";
 
   const navbarContent = (
     <div
@@ -121,7 +123,7 @@ export function ContactNavbar({ email, contactPrompt }: Props) {
                       : "translateY(0)",
                   }}
                 >
-                  {email}
+                  {copyFailed ? "Failed to copy" : email}
                 </div>
               </div>
 
@@ -136,7 +138,7 @@ export function ContactNavbar({ email, contactPrompt }: Props) {
                     <svg
                       className="h-4 w-4 transition-transform duration-300 ease-in-out"
                       style={{
-                        transform: isCopied
+                        transform: isCopied || copyFailed
                           ? "translateY(-100%)"
                           : "translateY(0)",
                       }}
@@ -151,7 +153,7 @@ export function ContactNavbar({ email, contactPrompt }: Props) {
                     <svg
                       className="h-4 w-4 absolute top-full left-0 transition-transform duration-300 ease-in-out"
                       style={{
-                        transform: isCopied
+                        transform: isCopied || copyFailed
                           ? "translateY(-100%)"
                           : "translateY(0)",
                         color: "white",
@@ -161,11 +163,19 @@ export function ContactNavbar({ email, contactPrompt }: Props) {
                       viewBox="0 0 24 24"
                       strokeWidth={2}
                     >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        d="M5 13l4 4L19 7"
-                      />
+                      {copyFailed ? (
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          d="M6 18L18 6M6 6l12 12"
+                        />
+                      ) : (
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          d="M5 13l4 4L19 7"
+                        />
+                      )}
                     </svg>
                   </div>
                 </div>

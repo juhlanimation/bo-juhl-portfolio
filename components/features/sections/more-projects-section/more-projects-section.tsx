@@ -1,36 +1,25 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useMemo } from "react"
 import type { MoreProjectsSectionSettings } from "./index"
 import type { CompactProject } from "@/lib/types"
 import { parseJsonWithFallback, getPadding, sectionPaddingMap } from "@/lib/utils"
+import { COMPACT_PLACEHOLDER_PROJECTS } from "@/lib/constants/placeholder-projects"
 import { ExpandableThumbnail } from "./expandable-thumbnail"
+import { DIMENSIONS } from "@/lib/constants/animations"
 
 interface Props {
   settings: MoreProjectsSectionSettings
   isSelected?: boolean
 }
 
-// Placeholder projects for preview
-const placeholderProjects: CompactProject[] = [
-  { id: "1", title: "SCENERY AND SENTIMENT | GENSHIN IMPACT", date: "2023", role: "Executive Producer", client: "HOYOVERSE", productionCompany: "SUN CREATURE", thumbnailUrl: "", videoUrl: "" },
-  { id: "2", title: "IT'S ON!", date: "2018", role: "Executive Producer, Editor", client: "RIOT GAMES", productionCompany: "SUN CREATURE", thumbnailUrl: "", videoUrl: "" },
-  { id: "3", title: "MARVEL MIDNIGHT SUN", date: "2022", role: "Executive Producer", client: "2K GAMES", productionCompany: "SUN CREATURE", thumbnailUrl: "", videoUrl: "" },
-  { id: "4", title: "NINJAGO LEGACY", date: "2021", role: "Executive Producer", client: "LEGO", productionCompany: "SUN CREATURE", thumbnailUrl: "", videoUrl: "" },
-  { id: "5", title: "THE GOBLIN QUEEN", date: "2024", role: "Executive Producer", client: "SUPERCELL", productionCompany: "SUN CREATURE", thumbnailUrl: "", videoUrl: "" },
-  { id: "6", title: "THE PATH, AN IONIAN MYTH", date: "2020", role: "Executive Producer, Editor", client: "RIOT GAMES", productionCompany: "SUN CREATURE", thumbnailUrl: "", videoUrl: "" },
-  { id: "7", title: "ONLY SLIGHTLY EXAGGERATED", date: "2019", role: "Executive Producer", client: "TRAVEL OREGON", productionCompany: "SUN CREATURE", thumbnailUrl: "", videoUrl: "" },
-  { id: "8", title: "SCENERY AND SENTIMENT | GENSHIN IMPACT", date: "2023", role: "Executive Producer", client: "HOYOVERSE", productionCompany: "SUN CREATURE", thumbnailUrl: "/images/other-projects/genshin-impact-thumbnail.webp", videoUrl: "/videos/other-projects/genshin-impact-hover.webm", fullLengthVideoUrl: "/videos/other-projects/genshin-impact-full-length.webm" },
-  { id: "9", title: "IT'S ON!", date: "2018", role: "Executive Producer, Editor", client: "RIOT GAMES", productionCompany: "SUN CREATURE", thumbnailUrl: "/images/other-projects/its-on-thumbnail.webp", videoUrl: "/videos/other-projects/its-on-hover.webm", fullLengthVideoUrl: "/videos/other-projects/its-on-full-length.webm" },
-]
-
 export function MoreProjectsSection({ settings, isSelected }: Props) {
   const [expandedId, setExpandedId] = useState<string | null>(null)
   const [isAnyPlayerOpen, setIsAnyPlayerOpen] = useState(false)
 
-  const projects = parseJsonWithFallback<CompactProject[]>(
-    settings.projectsJson,
-    placeholderProjects
+  const projects = useMemo(
+    () => parseJsonWithFallback<CompactProject[]>(settings.projectsJson, COMPACT_PLACEHOLDER_PROJECTS),
+    [settings.projectsJson]
   )
 
   const handleMouseLeave = () => {
@@ -66,7 +55,7 @@ export function MoreProjectsSection({ settings, isSelected }: Props) {
           {/* Horizontal thumbnails container */}
           <div
             className="flex gap-1 mt-9 overflow-visible"
-            style={{ height: "32rem" }}
+            style={{ height: DIMENSIONS.EXPANDED_THUMBNAIL_WIDTH }}
             onMouseLeave={handleMouseLeave}
           >
             {projects.map((project) => (
@@ -76,7 +65,6 @@ export function MoreProjectsSection({ settings, isSelected }: Props) {
                 isExpanded={expandedId === project.id}
                 onExpand={() => setExpandedId(project.id)}
                 onPlayerOpenChange={setIsAnyPlayerOpen}
-                expandScale={settings.expandScale}
                 transitionDuration={settings.transitionDuration}
               />
             ))}
@@ -89,8 +77,8 @@ export function MoreProjectsSection({ settings, isSelected }: Props) {
                 key={project.id}
                 className="min-w-0"
                 style={{
-                  flex: expandedId === project.id ? "0 0 32rem" : 1,
-                  width: expandedId === project.id ? "32rem" : undefined,
+                  flex: expandedId === project.id ? `0 0 ${DIMENSIONS.EXPANDED_THUMBNAIL_WIDTH}` : 1,
+                  width: expandedId === project.id ? DIMENSIONS.EXPANDED_THUMBNAIL_WIDTH : undefined,
                   transition: `flex ${settings.transitionDuration}ms ease-out, width ${settings.transitionDuration}ms ease-out`,
                 }}
               >
