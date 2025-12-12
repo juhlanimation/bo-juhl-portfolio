@@ -5,6 +5,7 @@ import { createPortal } from "react-dom";
 import Image from "next/image";
 import { gsap } from "gsap";
 import { useSmoothScroll } from "@/components/providers/smooth-scroll-provider";
+import { useTouchDevice } from "@/lib/hooks";
 
 interface VideoBackgroundProps {
   videoUrl?: string;
@@ -20,6 +21,7 @@ export function VideoBackground({
   const videoRef = useRef<HTMLVideoElement>(null);
   const isInViewRef = useRef(true);
   const smoothScroll = useSmoothScroll();
+  const isTouchDevice = useTouchDevice();
   const [isHovered, setIsHovered] = useState(false);
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
   const [mounted, setMounted] = useState(false);
@@ -125,8 +127,9 @@ export function VideoBackground({
           onMouseLeave={() => setIsHovered(false)}
           onMouseMove={handleMouseMove}
         />
-        {/* Cursor label for "scroll to explore" */}
+        {/* Cursor label for "scroll to explore" - hidden on touch devices */}
         {mounted &&
+          !isTouchDevice &&
           createPortal(
             <div
               className="fixed pointer-events-none z-50 text-[10px] font-medium whitespace-nowrap uppercase tracking-wide"

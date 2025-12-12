@@ -4,7 +4,7 @@ import { useState, useRef, useEffect } from "react"
 import { createPortal } from "react-dom"
 import Image from "next/image"
 import type { FeaturedProject } from "@/lib/types"
-import { useVideoPlayback } from "@/lib/hooks"
+import { useTouchDevice, useVideoPlayback } from "@/lib/hooks"
 import { VideoPlayer } from "../../blocks/video-player"
 
 interface ProjectCardProps {
@@ -19,6 +19,7 @@ interface ProjectCardProps {
  * Uses useVideoPlayback hook for DRY video control logic
  */
 export function ProjectCard({ project, alignment, textColor }: ProjectCardProps) {
+  const isTouchDevice = useTouchDevice()
   const [isHovered, setIsHovered] = useState(false)
   const [isPlayerOpen, setIsPlayerOpen] = useState(false)
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 })
@@ -135,8 +136,9 @@ export function ProjectCard({ project, alignment, textColor }: ProjectCardProps)
         {textContent}
       </div>
 
-      {/* Cursor label for "watch" - rendered via portal to escape transformed parent */}
+      {/* Cursor label for "watch" - hidden on touch devices */}
       {mounted &&
+        !isTouchDevice &&
         createPortal(
           <div
             className="fixed pointer-events-none z-50 text-[10px] font-medium whitespace-nowrap uppercase tracking-wide"

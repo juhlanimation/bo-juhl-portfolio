@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react"
 import { createPortal } from "react-dom"
+import { useTouchDevice } from "@/lib/hooks"
 
 interface CrossroadLinkProps {
   children: React.ReactNode
@@ -9,6 +10,7 @@ interface CrossroadLinkProps {
 }
 
 export function CrossroadLink({ children, href }: CrossroadLinkProps) {
+  const isTouchDevice = useTouchDevice()
   const [isHovered, setIsHovered] = useState(false)
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 })
   const [mounted, setMounted] = useState(false)
@@ -36,7 +38,9 @@ export function CrossroadLink({ children, href }: CrossroadLinkProps) {
       >
         {children}
       </a>
+      {/* Cursor label - hidden on touch devices */}
       {mounted &&
+        !isTouchDevice &&
         createPortal(
           <div
             className="fixed pointer-events-none z-50 text-[10px] font-medium whitespace-nowrap uppercase tracking-wide"

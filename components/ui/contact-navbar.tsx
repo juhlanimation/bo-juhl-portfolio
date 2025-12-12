@@ -103,8 +103,9 @@ export function ContactNavbar({ email, contactPrompt }: Props) {
               onClick={handleClick}
             >
               <div className="relative">
+                {/* Contact prompt - hidden on mobile */}
                 <div
-                  className="font-paragraph text-base md:text-lg font-medium tracking-wide whitespace-nowrap transition-transform duration-400 ease-in-out"
+                  className="hidden md:block font-paragraph text-base md:text-lg font-medium tracking-wide whitespace-nowrap transition-transform duration-400 ease-in-out"
                   style={{
                     transform: isHovered
                       ? "translateY(-100%)"
@@ -113,8 +114,9 @@ export function ContactNavbar({ email, contactPrompt }: Props) {
                 >
                   {contactPrompt}
                 </div>
+                {/* Email - always visible on mobile, slides in on hover for desktop */}
                 <div
-                  className="font-paragraph text-base md:text-lg font-medium tracking-wide whitespace-nowrap absolute top-full left-0 flex items-center gap-2 transition-transform duration-400 ease-in-out"
+                  className="font-paragraph text-base md:text-lg font-medium tracking-wide whitespace-nowrap md:absolute md:top-full left-0 flex items-center gap-2 transition-transform duration-400 ease-in-out"
                   style={{
                     transform: isHovered
                       ? "translateY(-100%)"

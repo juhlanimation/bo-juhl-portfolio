@@ -39,6 +39,14 @@ export function SmoothScrollProvider({ children, navbar }: Props) {
   useLayoutEffect(() => {
     window.scrollTo(0, 0)
 
+    // Prevent mobile URL bar from causing layout recalculations
+    ScrollTrigger.normalizeScroll(true)
+
+    // Ignore resize events from mobile URL bar (only recalc on significant changes)
+    ScrollTrigger.config({
+      ignoreMobileResize: true,
+    })
+
     const smoother = ScrollSmoother.create({
       wrapper: wrapperRef.current!,
       content: contentRef.current!,
@@ -69,6 +77,7 @@ export function SmoothScrollProvider({ children, navbar }: Props) {
 
     return () => {
       document.removeEventListener('click', handleAnchorClick)
+      ScrollTrigger.normalizeScroll(false)
       smoother.kill()
       smootherRef.current = null
     }

@@ -5,7 +5,7 @@ import { createPortal } from "react-dom"
 import Image from "next/image"
 import { gsap } from "gsap"
 import type { CompactProject } from "@/lib/types"
-import { useVideoPlayback } from "@/lib/hooks"
+import { useTouchDevice, useVideoPlayback } from "@/lib/hooks"
 import { VideoPlayer } from "../../blocks/video-player"
 
 interface ExpandableThumbnailProps {
@@ -32,6 +32,7 @@ export function ExpandableThumbnail({
 }: ExpandableThumbnailProps) {
   // Note: expandScale is received but not currently used (reserved for future use)
   void _expandScale
+  const isTouchDevice = useTouchDevice()
   const containerRef = useRef<HTMLDivElement>(null)
   const videoRef = useRef<HTMLVideoElement>(null)
   const blackOverlayRef = useRef<HTMLDivElement>(null)
@@ -144,8 +145,9 @@ export function ExpandableThumbnail({
         />
       </div>
 
-      {/* Cursor label for "watch" - rendered via portal to escape transformed parent */}
+      {/* Cursor label for "watch" - hidden on touch devices */}
       {mounted &&
+        !isTouchDevice &&
         createPortal(
           <div
             className="fixed pointer-events-none z-50 text-[10px] font-medium whitespace-nowrap uppercase tracking-wide"
