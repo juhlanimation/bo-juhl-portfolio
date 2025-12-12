@@ -47,7 +47,7 @@ export function MoreProjectsSection({ settings, isSelected }: Props) {
         paddingTop: getPadding(settings.paddingY, sectionPaddingMap),
         paddingBottom: getPadding(settings.paddingY, sectionPaddingMap),
       }}
-      className={`hidden md:block ${isSelected ? "ring-2 ring-primary" : ""}`}
+      className={`hidden md:block -mt-1 ${isSelected ? "ring-2 ring-primary" : ""}`}
     >
       <div className="content-container px-2">
         <div className="w-full">
