@@ -3,7 +3,7 @@
 import { useRef, useEffect, useState, useCallback } from 'react'
 import { createPortal } from 'react-dom'
 import { gsap } from 'gsap'
-import { useLenis } from '@/components/providers/smooth-scroll-provider'
+import { useSmoothScroll } from '@/components/providers/smooth-scroll-provider'
 import type { VideoPlayerProps } from './index'
 
 // Store video playback positions globally (persists across component lifecycles)
@@ -31,7 +31,7 @@ export function VideoPlayer({
   const [isSeeking, setIsSeeking] = useState(false)
   const controlsTimeoutRef = useRef<NodeJS.Timeout | null>(null)
   const progressBarRef = useRef<HTMLDivElement>(null)
-  const lenis = useLenis()
+  const smoothScroll = useSmoothScroll()
 
   // Handle mounting for portal
   useEffect(() => {
@@ -116,16 +116,16 @@ export function VideoPlayer({
         })
       }
 
-      // Prevent body scroll and stop Lenis
+      // Prevent body scroll and stop smooth scroll
       document.body.style.overflow = 'hidden'
-      lenis?.stop()
+      smoothScroll?.stop()
     }
 
     return () => {
       document.body.style.overflow = ''
-      lenis?.start()
+      smoothScroll?.start()
     }
-  }, [isOpen, isMounted, animationType, sourceRect, lenis])
+  }, [isOpen, isMounted, animationType, sourceRect, smoothScroll])
 
   // Handle close with reverse animation
   const handleClose = useCallback(() => {
@@ -158,12 +158,12 @@ export function VideoPlayer({
         timelineRef.current?.eventCallback('onReverseComplete', () => {
           gsap.set(overlayRef.current, { display: 'none' })
           document.body.style.overflow = ''
-          lenis?.start()
+          smoothScroll?.start()
           onClose()
         })
       }
     })
-  }, [onClose, videoUrl, lenis])
+  }, [onClose, videoUrl, smoothScroll])
 
   // Handle play/pause on center click
   const handleCenterClick = useCallback(() => {

@@ -1,43 +1,43 @@
-'use client'
-
-import type { LandingPageSettings } from './index'
-import { PageLayout } from '../../layouts/page-layout/page-layout'
-import { HeroSection } from '../../sections/hero-section/hero-section'
-import { AboutSection } from '../../sections/about-section/about-section'
-import { ProjectsSection } from '../../sections/projects-section/projects-section'
-import { MoreProjectsSection } from '../../sections/more-projects-section/more-projects-section'
-import { FooterSection } from '../../sections/footer-section/footer-section'
-import { projects, bioText } from '@/lib/projects-data'
+import { cacheLife } from "next/cache";
+import { Suspense } from "react";
+import type { LandingPageSettings } from "./index";
+import { PageLayout } from "../../layouts/page-layout/page-layout";
+import { HeroSection } from "../../sections/hero-section/hero-section";
+import { AboutSection } from "../../sections/about-section/about-section";
+import { ProjectsSection } from "../../sections/projects-section/projects-section";
+import { MoreProjectsSection } from "../../sections/more-projects-section/more-projects-section";
+import { FooterSection } from "../../sections/footer-section/footer-section";
+import { projects, bioText } from "@/lib/projects-data";
 
 interface Props {
-  settings: LandingPageSettings
-  isSelected?: boolean
+  settings: LandingPageSettings;
+  isSelected?: boolean;
 }
 
 // Default settings for child components
 const defaultPageLayoutSettings = {
   showNavbar: true,
-  navbarPosition: 'fixed' as const,
-  maxWidth: 'none',
-  backgroundColor: 'transparent',
-}
+  navbarPosition: "fixed" as const,
+  maxWidth: "none",
+  backgroundColor: "transparent",
+};
 
 const defaultHeroSettings = {
   name: "I'm Bo Juhl",
-  titles: 'EXECUTIVE PRODUCER\nPRODUCER\nEDITOR',
-  videoUrl: '/videos/frontpage/frontpage.webm',
-  posterImage: '/placeholderImage.webp',
+  titles: "EXECUTIVE PRODUCER\nPRODUCER\nEDITOR",
+  videoUrl: "/videos/frontpage/frontpage.webm",
+  posterImage: "/placeholderImage.webp",
   overlayOpacity: 0.4,
-  minHeight: '100vh',
-  backgroundColor: '#000000',
-}
+  minHeight: "100dvh",
+  backgroundColor: "#000000",
+};
 
 const defaultAboutSettings = {
-  backgroundColor: '#000000',
-  textColor: '#ffffff',
-  paddingY: 'xl',
-  title: 'ABOUT ME',
-  imageUrl: '/images/profile-highres.webp',
+  backgroundColor: "#000000",
+  textColor: "#ffffff",
+  paddingY: "xl",
+  title: "ABOUT ME",
+  imageUrl: "/images/profile-highres.webp",
   paragraph: bioText,
   logos: `/clients/netflix-alpha.png
 /clients/AMZN_STUDIOS - alpha.png
@@ -50,12 +50,12 @@ const defaultAboutSettings = {
 /clients/respawn-entertainment.png
 /clients/azuki-alpha.png`,
   marqueeSpeed: 30,
-}
+};
 
 // Transform centralized project data to component format
 const featuredProjects = projects
-  .filter(p => p.category === 'featured')
-  .map(p => ({
+  .filter((p) => p.category === "featured")
+  .map((p) => ({
     id: p.id,
     title: p.title,
     description: `${p.description}\n\n${p.year}\n${p.role}`,
@@ -64,11 +64,11 @@ const featuredProjects = projects
     fullLengthVideoUrl: p.fullLengthVideo,
     client: p.client,
     studio: p.studio,
-  }))
+  }));
 
 const otherProjects = projects
-  .filter(p => p.category === 'other')
-  .map(p => ({
+  .filter((p) => p.category === "other")
+  .map((p) => ({
     id: p.id,
     title: p.title,
     date: p.year,
@@ -78,42 +78,45 @@ const otherProjects = projects
     thumbnailUrl: p.thumbnail,
     videoUrl: p.hoverVideo || p.fullLengthVideo,
     fullLengthVideoUrl: p.fullLengthVideo,
-  }))
+  }));
 
 const defaultProjectsSettings = {
-  backgroundColor: '#ffffff',
-  textColor: '#000000',
-  paddingY: 'xl',
-  gap: '16rem',
+  backgroundColor: "#ffffff",
+  textColor: "#000000",
+  paddingY: "xl",
+  gap: "16rem",
   projectsJson: JSON.stringify(featuredProjects),
-}
+};
 
 const defaultMoreProjectsSettings = {
-  title: 'OTHER SELECTED PROJECTS',
-  dateRange: '2018-2024',
+  title: "OTHER SELECTED PROJECTS",
+  dateRange: "2018-2024",
   projectsJson: JSON.stringify(otherProjects),
-  backgroundColor: '#ffffff',
-  textColor: '#000000',
-  paddingY: 'xl',
+  backgroundColor: "#ffffff",
+  textColor: "#000000",
+  paddingY: "xl",
   expandScale: 2,
   transitionDuration: 400,
-}
+};
 
 const defaultFooterSettings = {
-  copyrightText: 'Copyright © Bo Juhl / All rights reserved',
-  contactEmail: 'hello@bojuhl.com',
-  contactLinkedIn: 'https://linkedin.com',
-  studioName: 'Crossroad Studio',
-  studioUrl: 'https://crossroad.studio',
-  studioEmail: 'bo@crossroad.studio',
-  studioLinkedIn: 'https://linkedin.com',
-  studioInstagram: 'https://instagram.com',
-  backgroundColor: '#000000',
-  textColor: '#ffffff',
-  paddingY: 'lg',
-}
+  copyrightText: "Copyright © Bo Juhl / All rights reserved",
+  contactEmail: "hello@bojuhl.com",
+  contactLinkedIn: "https://linkedin.com",
+  studioName: "Crossroad Studio",
+  studioUrl: "https://crossroad.studio",
+  studioEmail: "bo@crossroad.studio",
+  studioLinkedIn: "https://linkedin.com",
+  studioInstagram: "https://instagram.com",
+  backgroundColor: "#000000",
+  textColor: "#ffffff",
+  paddingY: "lg",
+};
 
-export function LandingPage({ settings, isSelected }: Props) {
+export async function LandingPage({ settings, isSelected }: Props) {
+  "use cache";
+  cacheLife("days");
+
   return (
     <PageLayout
       settings={{
@@ -130,8 +133,11 @@ export function LandingPage({ settings, isSelected }: Props) {
         }}
       />
       <ProjectsSection settings={defaultProjectsSettings} />
-      <MoreProjectsSection settings={defaultMoreProjectsSettings} />
+      {/* MoreProjectsSection stays client-side due to complex GSAP/ScrollSmoother interactions */}
+      <Suspense fallback={<div className="h-[600px] bg-white" />}>
+        <MoreProjectsSection settings={defaultMoreProjectsSettings} />
+      </Suspense>
       <FooterSection settings={defaultFooterSettings} />
     </PageLayout>
-  )
+  );
 }

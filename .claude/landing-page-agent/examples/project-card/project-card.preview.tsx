@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useRef } from 'react'
+import Image from 'next/image'
 import type { ProjectCardSettings } from './index'
 
 interface Props {
@@ -51,11 +52,12 @@ export function ProjectCardPreview({ settings, isSelected }: Props) {
       >
         {/* Thumbnail (always rendered, hidden when video plays) */}
         {settings.thumbnailUrl && (
-          <img
+          <Image
             src={settings.thumbnailUrl}
             alt={settings.title}
+            fill
             className={`
-              absolute inset-0 w-full h-full object-cover
+              object-cover
               transition-opacity duration-300
               ${showVideo ? 'opacity-0' : 'opacity-100'}
             `}

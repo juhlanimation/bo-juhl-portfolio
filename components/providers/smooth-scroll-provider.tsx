@@ -1,70 +1,55 @@
 'use client'
 
-import { useEffect, useRef, createContext, useContext } from 'react'
-import Lenis from 'lenis'
+import { useRef, createContext, useContext, useLayoutEffect, useMemo, useState } from 'react'
 import { gsap } from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
+import { ScrollSmoother } from 'gsap/ScrollSmoother'
+import { ScrollToPlugin } from 'gsap/ScrollToPlugin'
 
-// Register GSAP plugins
-gsap.registerPlugin(ScrollTrigger)
+// Register plugins (only on client)
+if (typeof window !== 'undefined') {
+  gsap.registerPlugin(ScrollTrigger, ScrollSmoother, ScrollToPlugin)
+}
 
 interface Props {
   children: React.ReactNode
   navbar?: React.ReactNode
 }
 
-interface LenisContextValue {
-  lenis: Lenis | null
+interface SmoothScrollContextValue {
+  smoother: ScrollSmoother | null
   stop: () => void
   start: () => void
+  scrollTo: (target: string | HTMLElement, smooth?: boolean) => void
+  getScroll: () => number
 }
 
-const LenisContext = createContext<LenisContextValue | null>(null)
+const SmoothScrollContext = createContext<SmoothScrollContextValue | null>(null)
 
-export function useLenis() {
-  return useContext(LenisContext)
+export function useSmoothScroll() {
+  return useContext(SmoothScrollContext)
 }
 
 export function SmoothScrollProvider({ children, navbar }: Props) {
-  const lenisRef = useRef<Lenis | null>(null)
+  const smootherRef = useRef<ScrollSmoother | null>(null)
+  const wrapperRef = useRef<HTMLDivElement>(null)
+  const contentRef = useRef<HTMLDivElement>(null)
+  const [isReady, setIsReady] = useState(false)
 
-  useEffect(() => {
-    // Ensure we're at the top
+  useLayoutEffect(() => {
     window.scrollTo(0, 0)
 
-    // Initialize Lenis smooth scrolling
-    const lenis = new Lenis({
-      duration: 1.2,
-      easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)), // Expo easing
-      orientation: 'vertical',
-      gestureOrientation: 'vertical',
-      smoothWheel: true,
-      touchMultiplier: 2,
-      autoResize: true,
+    const smoother = ScrollSmoother.create({
+      wrapper: wrapperRef.current!,
+      content: contentRef.current!,
+      smooth: 1.2,
+      effects: true,
+      smoothTouch: 0.1,
     })
 
-    lenisRef.current = lenis
+    smootherRef.current = smoother
+    setIsReady(true)
 
-    // Connect Lenis to ScrollTrigger immediately
-    lenis.on('scroll', ScrollTrigger.update)
-
-    // Add Lenis to GSAP ticker for smooth animation sync
-    const rafCallback = (time: number) => {
-      lenis.raf(time * 1000)
-    }
-    gsap.ticker.add(rafCallback)
-
-    // Disable GSAP's default lag smoothing for better Lenis sync
-    gsap.ticker.lagSmoothing(0)
-
-    // Pre-warm ScrollTrigger during the ~1 second before user can interact
-    // This runs all expensive calculations BEFORE the first scroll
-    const preWarmTimeout = setTimeout(() => {
-      ScrollTrigger.refresh() // Calculate all trigger positions
-      ScrollTrigger.update()  // Run one update cycle to initialize caches
-    }, 200) // After React components have mounted their ScrollTriggers
-
-    // Handle anchor link clicks for smooth scrolling
     const handleAnchorClick = (e: MouseEvent) => {
       const target = e.target as HTMLElement
       const anchor = target.closest('a[href^="#"]')
@@ -74,10 +59,7 @@ export function SmoothScrollProvider({ children, navbar }: Props) {
           e.preventDefault()
           const targetElement = document.querySelector(href) as HTMLElement | null
           if (targetElement) {
-            lenis.scrollTo(targetElement, {
-              offset: 0,
-              duration: 1.5,
-            })
+            smoother.scrollTo(targetElement, true, 'top top')
           }
         }
       }
@@ -85,27 +67,32 @@ export function SmoothScrollProvider({ children, navbar }: Props) {
 
     document.addEventListener('click', handleAnchorClick)
 
-    // Cleanup on unmount
     return () => {
-      clearTimeout(preWarmTimeout)
       document.removeEventListener('click', handleAnchorClick)
-      lenis.destroy()
-      gsap.ticker.remove(rafCallback)
+      smoother.kill()
+      smootherRef.current = null
     }
   }, [])
 
-  const contextValue: LenisContextValue = {
-    lenis: lenisRef.current,
-    stop: () => lenisRef.current?.stop(),
-    start: () => lenisRef.current?.start(),
-  }
+  // Memoize context value and re-create when smoother is ready
+  const contextValue = useMemo<SmoothScrollContextValue>(() => ({
+    smoother: smootherRef.current,
+    stop: () => smootherRef.current?.paused(true),
+    start: () => smootherRef.current?.paused(false),
+    scrollTo: (target, smooth = true) => {
+      smootherRef.current?.scrollTo(target, smooth)
+    },
+    getScroll: () => smootherRef.current?.scrollTop() || 0
+  }), [isReady])
 
   return (
-    <LenisContext.Provider value={contextValue}>
-      <div id="smooth-scroll-content">
-        {navbar}
-        {children}
+    <SmoothScrollContext.Provider value={contextValue}>
+      <div id="smooth-wrapper" ref={wrapperRef}>
+        <div id="smooth-content" ref={contentRef}>
+          {navbar}
+          {children}
+        </div>
       </div>
-    </LenisContext.Provider>
+    </SmoothScrollContext.Provider>
   )
 }

@@ -51,8 +51,8 @@ export const __sectionName__Schema = {
     defaultValue: 'auto',
     options: [
       { value: 'auto', label: 'Auto' },
-      { value: '50vh', label: 'Half Screen' },
-      { value: '100vh', label: 'Full Screen' },
+      { value: '50dvh', label: 'Half Screen' },
+      { value: '100dvh', label: 'Full Screen' },
     ],
     group: 'Style',
     width: 'half',

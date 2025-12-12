@@ -17,7 +17,6 @@ export interface HeroSectionSettings {
   // Media
   videoUrl: string
   posterImage: string
-  overlayOpacity: number
   // Style
   minHeight: string
   backgroundColor: string
@@ -59,25 +58,16 @@ export const heroSectionSchema = {
     defaultValue: '',
     group: 'Media',
   },
-  overlayOpacity: {
-    type: 'slider',
-    label: 'Overlay Opacity',
-    defaultValue: 0.3,
-    min: 0,
-    max: 1,
-    step: 0.1,
-    group: 'Media',
-  },
 
   // Style Group
   minHeight: {
     type: 'select',
     label: 'Min Height',
-    defaultValue: '100vh',
+    defaultValue: '100dvh',
     options: [
-      { value: '100vh', label: 'Full Screen' },
-      { value: '80vh', label: '80% Screen' },
-      { value: '60vh', label: '60% Screen' },
+      { value: '100dvh', label: 'Full Screen' },
+      { value: '80dvh', label: '80% Screen' },
+      { value: '60dvh', label: '60% Screen' },
     ],
     group: 'Style',
   },

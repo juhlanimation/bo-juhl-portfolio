@@ -5,16 +5,8 @@
  * White background, black text.
  */
 
-export interface ProjectItem {
-  id: string
-  title: string
-  description: string
-  thumbnailUrl: string
-  videoUrl: string // Hover video
-  fullLengthVideoUrl?: string // Full-length video for player
-  client?: string
-  studio?: string
-}
+// Re-export from shared types for backwards compatibility
+export type { FeaturedProject as ProjectItem } from "@/lib/types"
 
 // ============================================================================
 // Settings Interface

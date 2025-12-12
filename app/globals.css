@@ -51,11 +51,6 @@ body {
   overflow-x: hidden;
 }
 
-/* Apply transforms to main content wrapper instead of body to preserve fixed positioning */
-#smooth-scroll-content {
-  /* Transforms removed to allow mix-blend-mode to work on navbar */
-}
-
 /* Marquee Animation */
 @keyframes marquee {
   0% {
@@ -88,33 +83,6 @@ body {
   to {
     transform: translateY(0);
   }
-}
-
-/* Lenis smooth scroll styles */
-html.lenis,
-html.lenis body {
-  height: auto;
-}
-
-.lenis.lenis-smooth {
-  scroll-behavior: auto !important;
-  will-change: scroll-position;
-}
-
-.lenis.lenis-smooth body {
-  will-change: transform;
-}
-
-.lenis.lenis-smooth [data-lenis-prevent] {
-  overscroll-behavior: contain;
-}
-
-.lenis.lenis-stopped {
-  overflow: hidden;
-}
-
-.lenis.lenis-smooth iframe {
-  pointer-events: none;
 }
 
 /* Box sizing for all elements */

@@ -6,17 +6,8 @@
  * White background, black text.
  */
 
-export interface MoreProjectItem {
-  id: string
-  title: string
-  date?: string // Project date
-  role?: string // My role in the project
-  client?: string // Client name
-  productionCompany?: string // Production company/studio
-  thumbnailUrl: string
-  videoUrl: string // Hover video
-  fullLengthVideoUrl?: string // Full-length video for player
-}
+// Re-export from shared types for backwards compatibility
+export type { CompactProject as MoreProjectItem } from "@/lib/types"
 
 // ============================================================================
 // Settings Interface
