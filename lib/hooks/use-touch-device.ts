@@ -3,32 +3,36 @@
 import { useState, useEffect } from "react"
 
 /**
- * Hook to detect if the current device is a touch device
- * Returns true if touch is detected or screen is mobile-sized
+ * Hook to detect if the user is currently using touch input
+ * Toggles based on actual interaction:
+ * - Touch event → touch mode (hide cursor labels)
+ * - Mouse move → mouse mode (show cursor labels)
  */
 export function useTouchDevice(): boolean {
-  const [isTouchDevice, setIsTouchDevice] = useState(false)
+  const [isTouchMode, setIsTouchMode] = useState(false)
 
   useEffect(() => {
-    const checkTouchDevice = () => {
-      const hasTouch =
-        "ontouchstart" in window ||
-        navigator.maxTouchPoints > 0
+    let lastTouchTime = 0
 
-      const isMobile = window.matchMedia("(max-width: 768px)").matches
-
-      setIsTouchDevice(hasTouch || isMobile)
+    const handleTouchStart = () => {
+      lastTouchTime = Date.now()
+      setIsTouchMode(true)
     }
 
-    checkTouchDevice()
+    const handleMouseMove = () => {
+      // Ignore mouse events that fire immediately after touch (ghost events)
+      if (Date.now() - lastTouchTime < 500) return
+      setIsTouchMode(false)
+    }
 
-    const mediaQuery = window.matchMedia("(max-width: 768px)")
-    mediaQuery.addEventListener("change", checkTouchDevice)
+    window.addEventListener("touchstart", handleTouchStart, { passive: true })
+    window.addEventListener("mousemove", handleMouseMove, { passive: true })
 
     return () => {
-      mediaQuery.removeEventListener("change", checkTouchDevice)
+      window.removeEventListener("touchstart", handleTouchStart)
+      window.removeEventListener("mousemove", handleMouseMove)
     }
   }, [])
 
-  return isTouchDevice
+  return isTouchMode
 }

@@ -47,6 +47,11 @@ export function SmoothScrollProvider({ children, navbar }: Props) {
       ignoreMobileResize: true,
     })
 
+    // Force GPU acceleration for smoother animations
+    gsap.config({
+      force3D: true,
+    })
+
     const smoother = ScrollSmoother.create({
       wrapper: wrapperRef.current!,
       content: contentRef.current!,
