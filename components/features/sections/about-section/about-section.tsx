@@ -65,6 +65,9 @@ export async function AboutSection({ settings, isSelected }: Props) {
             >
               {renderParagraphWithLinks(settings.paragraph || "About text goes here...")}
             </p>
+            <p className="font-paragraph text-sm md:text-sm text-right mt-4 italic">
+              Bo Juhl
+            </p>
           </div>
         </div>
 
