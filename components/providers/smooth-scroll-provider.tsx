@@ -17,7 +17,7 @@ interface Props {
 }
 
 interface SmoothScrollContextValue {
-  smoother: ScrollSmoother | null
+  getSmoother: () => ScrollSmoother | null
   stop: () => void
   start: () => void
   scrollTo: (target: string | HTMLElement, smooth?: boolean) => void
@@ -74,23 +74,24 @@ export function SmoothScrollProvider({ children, navbar }: Props) {
     }
   }, [])
 
-  // Memoize context value and re-create when smoother is ready
+  // Memoize context value - all ref access deferred to callbacks to avoid accessing during render
   const contextValue = useMemo<SmoothScrollContextValue>(() => ({
-    smoother: smootherRef.current,
+    getSmoother: () => smootherRef.current,
     stop: () => smootherRef.current?.paused(true),
     start: () => smootherRef.current?.paused(false),
     scrollTo: (target, smooth = true) => {
       smootherRef.current?.scrollTo(target, smooth)
     },
     getScroll: () => smootherRef.current?.scrollTop() || 0
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }), [isReady])
 
   return (
     <SmoothScrollContext.Provider value={contextValue}>
       <div id="smooth-wrapper" ref={wrapperRef}>
-        <div id="smooth-content" ref={contentRef}>
-          {navbar}
+        <div id="smooth-content" ref={contentRef} style={{ isolation: 'isolate' }}>
           {children}
+          {navbar}
         </div>
       </div>
     </SmoothScrollContext.Provider>

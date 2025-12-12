@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect, useRef } from "react";
+import { useSmoothScroll } from "@/components/providers/smooth-scroll-provider";
 
 interface Props {
   email: string;
@@ -10,6 +11,25 @@ interface Props {
 export function ContactNavbar({ email, contactPrompt }: Props) {
   const [isHovered, setIsHovered] = useState(false);
   const [isCopied, setIsCopied] = useState(false);
+  const navRef = useRef<HTMLDivElement>(null);
+  const smoothScroll = useSmoothScroll();
+
+  // Keep navbar visually fixed by counteracting the smooth-content transform
+  useEffect(() => {
+    const smoother = smoothScroll?.getSmoother();
+    if (!smoother || !navRef.current) return;
+
+    let rafId: number;
+    const updatePosition = () => {
+      if (navRef.current) {
+        navRef.current.style.transform = `translateY(${smoother.scrollTop()}px)`;
+      }
+      rafId = requestAnimationFrame(updatePosition);
+    };
+
+    rafId = requestAnimationFrame(updatePosition);
+    return () => cancelAnimationFrame(rafId);
+  }, [smoothScroll]);
 
   const handleMouseEnter = useCallback(() => {
     setIsHovered(true);
@@ -34,17 +54,21 @@ export function ContactNavbar({ email, contactPrompt }: Props) {
     }
   }, [email, isHovered]);
 
-  return (
+  // When copied, revert to difference blend mode with white text
+  const showPurple = isHovered && !isCopied;
+
+  const navbarContent = (
     <div
+      ref={navRef}
       style={{
-        position: "sticky",
+        position: "absolute",
         top: 0,
         left: 0,
         right: 0,
         height: 0,
         zIndex: 9999,
         pointerEvents: "none",
-        mixBlendMode: "difference",
+        mixBlendMode: showPurple ? "normal" : "difference",
       }}
     >
       <nav
@@ -70,7 +94,10 @@ export function ContactNavbar({ email, contactPrompt }: Props) {
             }}
           >
             <div
-              className="relative overflow-hidden cursor-pointer h-6 flex items-center text-white"
+              className="relative overflow-hidden cursor-pointer h-6 flex items-center"
+              style={{
+                color: showPurple ? "var(--interaction)" : "white",
+              }}
               onMouseEnter={handleMouseEnter}
               onMouseLeave={handleMouseLeave}
               onClick={handleClick}
@@ -127,6 +154,7 @@ export function ContactNavbar({ email, contactPrompt }: Props) {
                         transform: isCopied
                           ? "translateY(-100%)"
                           : "translateY(0)",
+                        color: "white",
                       }}
                       fill="none"
                       stroke="currentColor"
@@ -148,4 +176,6 @@ export function ContactNavbar({ email, contactPrompt }: Props) {
       </nav>
     </div>
   );
+
+  return navbarContent;
 }

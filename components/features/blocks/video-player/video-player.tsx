@@ -33,8 +33,9 @@ export function VideoPlayer({
   const progressBarRef = useRef<HTMLDivElement>(null)
   const smoothScroll = useSmoothScroll()
 
-  // Handle mounting for portal
+  // Handle mounting for portal (intentional SSR safety pattern)
   useEffect(() => {
+     
     setIsMounted(true)
     return () => setIsMounted(false)
   }, [])
@@ -51,7 +52,8 @@ export function VideoPlayer({
       // Kill any existing animation
       timelineRef.current?.kill()
 
-      // Reset state - video hidden during wipe
+      // Reset state - video hidden during wipe (intentional synchronization with GSAP animation)
+       
       setShowVideo(false)
       gsap.set(video, { opacity: 0 })
 
@@ -125,6 +127,8 @@ export function VideoPlayer({
       document.body.style.overflow = ''
       smoothScroll?.start()
     }
+    // videoUrl is accessed inside callbacks, not as a reactive dependency
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isOpen, isMounted, animationType, sourceRect, smoothScroll])
 
   // Handle close with reverse animation

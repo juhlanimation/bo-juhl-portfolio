@@ -20,6 +20,8 @@ const placeholderProjects: CompactProject[] = [
   { id: "5", title: "THE GOBLIN QUEEN", date: "2024", role: "Executive Producer", client: "SUPERCELL", productionCompany: "SUN CREATURE", thumbnailUrl: "", videoUrl: "" },
   { id: "6", title: "THE PATH, AN IONIAN MYTH", date: "2020", role: "Executive Producer, Editor", client: "RIOT GAMES", productionCompany: "SUN CREATURE", thumbnailUrl: "", videoUrl: "" },
   { id: "7", title: "ONLY SLIGHTLY EXAGGERATED", date: "2019", role: "Executive Producer", client: "TRAVEL OREGON", productionCompany: "SUN CREATURE", thumbnailUrl: "", videoUrl: "" },
+  { id: "8", title: "SCENERY AND SENTIMENT | GENSHIN IMPACT", date: "2023", role: "Executive Producer", client: "HOYOVERSE", productionCompany: "SUN CREATURE", thumbnailUrl: "/images/other-projects/genshin-impact-thumbnail.webp", videoUrl: "/videos/other-projects/genshin-impact-hover.webm", fullLengthVideoUrl: "/videos/other-projects/genshin-impact-full-length.webm" },
+  { id: "9", title: "IT'S ON!", date: "2018", role: "Executive Producer, Editor", client: "RIOT GAMES", productionCompany: "SUN CREATURE", thumbnailUrl: "/images/other-projects/its-on-thumbnail.webp", videoUrl: "/videos/other-projects/its-on-hover.webm", fullLengthVideoUrl: "/videos/other-projects/its-on-full-length.webm" },
 ]
 
 export function MoreProjectsSection({ settings, isSelected }: Props) {
@@ -47,15 +49,15 @@ export function MoreProjectsSection({ settings, isSelected }: Props) {
       }}
       className={`hidden md:block ${isSelected ? "ring-2 ring-primary" : ""}`}
     >
-      <div className="content-container px-10">
+      <div className="content-container px-2">
         <div className="w-full">
           {/* Section title */}
           <div className="flex justify-start mb-8">
             <div className="flex flex-col">
-              <h2 className="font-title text-xs font-bold uppercase text-right">
+              <h2 className="font-title text-[10px] font-bold uppercase text-right">
                 {settings.title || "OTHER SELECTED PROJECTS"}
               </h2>
-              <span className="font-paragraph text-xs text-right">
+              <span className="font-paragraph text-[10px] text-right">
                 {settings.dateRange || "2018-2024"}
               </span>
             </div>
@@ -87,12 +89,13 @@ export function MoreProjectsSection({ settings, isSelected }: Props) {
                 key={project.id}
                 className="min-w-0"
                 style={{
-                  flex: expandedId === project.id ? settings.expandScale : 1,
-                  transition: `flex ${settings.transitionDuration}ms ease-out`,
+                  flex: expandedId === project.id ? "0 0 32rem" : 1,
+                  width: expandedId === project.id ? "32rem" : undefined,
+                  transition: `flex ${settings.transitionDuration}ms ease-out, width ${settings.transitionDuration}ms ease-out`,
                 }}
               >
                 <div
-                  className={`font-paragraph flex justify-between px-3 text-xs py-2 transition-opacity duration-300 ${
+                  className={`font-paragraph flex justify-between px-2 text-[10px] py-2 transition-opacity duration-300 ${
                     expandedId === project.id && !isAnyPlayerOpen ? "opacity-100" : "opacity-0"
                   }`}
                   style={{
@@ -100,22 +103,22 @@ export function MoreProjectsSection({ settings, isSelected }: Props) {
                   }}
                 >
                   <div className="flex flex-col gap-1.5 items-start flex-1 min-w-0 pr-2">
-                    <span className="opacity-60 text-xs whitespace-nowrap overflow-hidden text-ellipsis block">
+                    <span className="opacity-60 text-[10px] whitespace-nowrap overflow-hidden text-ellipsis block">
                       {project.date}
                     </span>
-                    <span className="opacity-60 uppercase text-xs leading-tight whitespace-nowrap overflow-hidden text-ellipsis block">
+                    <span className="opacity-60 text-[10px] leading-tight whitespace-nowrap overflow-hidden text-ellipsis block">
                       {project.role}
                     </span>
                   </div>
                   <div className="flex flex-col gap-1.5 items-end text-right flex-1 min-w-0 pl-2">
-                    <span className="font-bold uppercase text-xs leading-tight whitespace-nowrap overflow-hidden text-ellipsis block">
+                    <span className="font-bold uppercase text-[10px] leading-tight whitespace-nowrap overflow-hidden text-ellipsis block">
                       {project.title}
                     </span>
-                    <span className="opacity-60 text-xs leading-tight uppercase whitespace-nowrap overflow-hidden text-ellipsis block">
-                      {project.client}
+                    <span className="opacity-60 text-[10px] leading-tight whitespace-nowrap overflow-hidden text-ellipsis block">
+                      Client <span className="uppercase">{project.client}</span>
                     </span>
-                    <span className="opacity-60 text-xs leading-tight uppercase whitespace-nowrap overflow-hidden text-ellipsis block">
-                      {project.productionCompany}
+                    <span className="opacity-60 text-[10px] leading-tight whitespace-nowrap overflow-hidden text-ellipsis block">
+                      Studio <span className="uppercase">{project.productionCompany}</span>
                     </span>
                   </div>
                 </div>

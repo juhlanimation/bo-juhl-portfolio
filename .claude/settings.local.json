@@ -28,7 +28,8 @@
       "Bash(npm update:*)",
       "Bash(npm show:*)",
       "Bash(npm uninstall:*)",
-      "Bash(npx tsc:*)"
+      "Bash(npx tsc:*)",
+      "Bash(npm run lint:*)"
     ],
     "deny": [],
     "ask": []

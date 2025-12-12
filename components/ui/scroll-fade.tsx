@@ -1,11 +1,12 @@
 "use client"
 
-import { useRef, ReactNode } from "react"
+import { useRef, ReactNode, CSSProperties } from "react"
 import { useScrollFade } from "@/lib/hooks/use-scroll-fade"
 
 interface ScrollFadeProps {
   children: ReactNode
   className?: string
+  style?: CSSProperties
   /** Viewport position where fade starts (% from top). Default 70 = starts when element top hits 70% of viewport */
   start?: number
   /** Viewport position where fade ends (% from top). Default 30 = ends when element top hits 30% of viewport */
@@ -19,6 +20,7 @@ interface ScrollFadeProps {
 export function ScrollFade({
   children,
   className = "",
+  style,
   start = 70,
   end = 30,
 }: ScrollFadeProps) {
@@ -27,7 +29,7 @@ export function ScrollFade({
   useScrollFade(ref, { start, end })
 
   return (
-    <div ref={ref} className={className} style={{ visibility: "hidden" }}>
+    <div ref={ref} className={className} style={{ visibility: "hidden", ...style }}>
       {children}
     </div>
   )

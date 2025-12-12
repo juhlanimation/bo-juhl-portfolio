@@ -14,8 +14,9 @@ export function PageLayout({ settings, isSelected, children }: Props) {
         backgroundColor: settings.backgroundColor,
         maxWidth: settings.maxWidth === "none" ? undefined : settings.maxWidth,
         margin: settings.maxWidth === "none" ? undefined : "0 auto",
+        minHeight: '100dvh',
       }}
-      className={`relative min-h-screen ${isSelected ? "ring-2 ring-primary" : ""}`}
+      className={`relative ${isSelected ? "ring-2 ring-primary" : ""}`}
     >
       {/* Main content area - no padding, hero goes under navbar */}
       <main>{children}</main>

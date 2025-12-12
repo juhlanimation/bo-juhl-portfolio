@@ -27,14 +27,14 @@ export async function HeroSection({ settings, isSelected }: Props) {
       }}
       className={`relative ${isSelected ? "ring-2 ring-primary" : ""}`}
     >
-      <div className="content-container relative min-h-screen mx-auto">
+      <div className="content-container relative mx-auto" style={{ minHeight: '100dvh' }}>
         <VideoBackground
           videoUrl={settings.videoUrl}
           posterImage={settings.posterImage}
           backgroundColor={settings.backgroundColor}
         />
 
-        <div className="relative min-h-screen flex flex-col px-8 md:px-16 lg:px-24">
+        <div className="relative flex flex-col px-8 md:px-16 lg:px-24 pointer-events-none" style={{ minHeight: '100dvh' }}>
           <div className="grow" style={{ minHeight: "55dvh" }} />
 
           <div className="flex flex-col gap-4 md:gap-6 mt-6 pb-24">
@@ -45,7 +45,7 @@ export async function HeroSection({ settings, isSelected }: Props) {
                 mixBlendMode: "difference",
               }}
             >
-              I'm Bo Juhl
+              I&apos;m Bo Juhl
             </p>
             {titles.map((title, index) => (
               <h1

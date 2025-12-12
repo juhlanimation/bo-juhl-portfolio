@@ -3,6 +3,7 @@
 :root {
   --background: #ffffff;
   --foreground: #171717;
+  --interaction: #9933ff;
 }
 
 @theme inline {
@@ -36,6 +37,7 @@
   :root {
     --background: #0a0a0a;
     --foreground: #ededed;
+    --interaction: #9933ff;
   }
 }
 
@@ -57,7 +59,7 @@ body {
     transform: translateX(0);
   }
   100% {
-    transform: translateX(-50%);
+    transform: translateX(-25%);
   }
 }
 
@@ -113,7 +115,7 @@ body {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #171717;
+  background: #9933ff;
   border-radius: 0;
 }
 
@@ -122,18 +124,18 @@ body {
     background: #0a0a0a;
   }
   ::-webkit-scrollbar-thumb {
-    background: #ededed;
+    background: #9933ff;
   }
 }
 
 /* Firefox scrollbar */
 html {
   scrollbar-width: thin;
-  scrollbar-color: #171717 #ffffff;
+  scrollbar-color: #9933ff #ffffff;
 }
 
 @media (prefers-color-scheme: dark) {
   html {
-    scrollbar-color: #ededed #0a0a0a;
+    scrollbar-color: #9933ff #0a0a0a;
   }
 }

@@ -64,7 +64,7 @@ export async function ProjectsSection({ settings, isSelected }: Props) {
     placeholderProjects
   )
 
-  const gapValue = settings.gap || "4rem"
+  const gapValue = settings.gap || "3.2rem"
   const mobileGap = scaleUnitValue(gapValue, 0.5)
 
   return (

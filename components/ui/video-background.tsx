@@ -1,6 +1,7 @@
 "use client";
 
-import { useRef, useEffect, useCallback } from "react";
+import { useRef, useEffect, useCallback, useState } from "react";
+import { createPortal } from "react-dom";
 import Image from "next/image";
 import { gsap } from "gsap";
 import { useSmoothScroll } from "@/components/providers/smooth-scroll-provider";
@@ -19,6 +20,20 @@ export function VideoBackground({
   const videoRef = useRef<HTMLVideoElement>(null);
   const isInViewRef = useRef(true);
   const smoothScroll = useSmoothScroll();
+  const [isHovered, setIsHovered] = useState(false);
+  const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
+  const [mounted, setMounted] = useState(false);
+
+  // For portal (SSR safety - intentional pattern)
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- intentional SSR hydration
+    setMounted(true);
+  }, []);
+
+  // Handle mouse move for cursor label
+  const handleMouseMove = (e: React.MouseEvent) => {
+    setMousePos({ x: e.clientX, y: e.clientY });
+  };
 
   // Pause/resume video based on scroll position (50vh threshold)
   useEffect(() => {
@@ -91,17 +106,44 @@ export function VideoBackground({
 
   if (videoUrl) {
     return (
-      <video
-        ref={videoRef}
-        src={videoUrl}
-        muted
-        loop
-        playsInline
-        autoPlay
-        preload="auto"
-        className="absolute inset-0 w-full h-full object-cover"
-        style={{ backgroundColor }}
-      />
+      <>
+        <video
+          ref={videoRef}
+          src={videoUrl}
+          muted
+          loop
+          playsInline
+          autoPlay
+          preload="auto"
+          className="absolute inset-0 w-full h-full object-cover"
+          style={{ backgroundColor }}
+        />
+        {/* Invisible overlay to capture hover events across entire section */}
+        <div
+          className="absolute inset-0 z-10"
+          onMouseEnter={() => setIsHovered(true)}
+          onMouseLeave={() => setIsHovered(false)}
+          onMouseMove={handleMouseMove}
+        />
+        {/* Cursor label for "scroll to explore" */}
+        {mounted &&
+          createPortal(
+            <div
+              className="fixed pointer-events-none z-50 text-[10px] font-medium whitespace-nowrap uppercase tracking-wide"
+              style={{
+                left: 0,
+                top: 0,
+                transform: `translate(${mousePos.x + 24}px, ${mousePos.y + 8}px)`,
+                transition: "opacity 0.15s ease-out",
+                color: "var(--interaction)",
+                opacity: isHovered ? 1 : 0,
+              }}
+            >
+              scroll to explore
+            </div>,
+            document.body
+          )}
+      </>
     );
   }
 

@@ -195,6 +195,34 @@ export const projects: Project[] = [
     fullLengthVideo: '/videos/other-projects/travel-oregon-full-length.webm',
     category: 'other',
     order: 13
+  },
+  {
+    id: 'placeholder-14',
+    title: 'SCENERY AND SENTIMENT | GENSHIN IMPACT',
+    description: '',
+    year: '2023',
+    role: 'Executive Producer',
+    client: 'HOYOVERSE',
+    studio: 'SUN CREATURE',
+    thumbnail: '/images/other-projects/genshin-impact-thumbnail.webp',
+    hoverVideo: '/videos/other-projects/genshin-impact-hover.webm',
+    fullLengthVideo: '/videos/other-projects/genshin-impact-full-length.webm',
+    category: 'other',
+    order: 14
+  },
+  {
+    id: 'placeholder-15',
+    title: "IT'S ON!",
+    description: '',
+    year: '2018',
+    role: 'Executive Producer, Editor',
+    client: 'RIOT GAMES',
+    studio: 'SUN CREATURE',
+    thumbnail: '/images/other-projects/its-on-thumbnail.webp',
+    hoverVideo: '/videos/other-projects/its-on-hover.webm',
+    fullLengthVideo: '/videos/other-projects/its-on-full-length.webm',
+    category: 'other',
+    order: 15
   }
 ];
 
